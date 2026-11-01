@@ -10,16 +10,24 @@ server.port=8080
 
 spring.datasource.url=jdbc:postgresql://localhost:5432/safidy
 spring.datasource.username=postgres
-spring.datasource.password=VOTRE_MOT_DE_PASSE_ICI
+spring.datasource.password=1305
 spring.datasource.driver-class-name=org.postgresql.Driver
 
 spring.jpa.hibernate.ddl-auto=none
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
-spring.jpa.open-in-view=false
+spring.jpa.open-in-view=true
 
 spring.jackson.date-format=dd/MM/yyyy
 spring.jackson.time-zone=Indian/Antananarivo
 
 logging.level.mg.safidy=DEBUG
 logging.level.org.springframework.security=INFO
+
+# =====================================================
+# Configuration JWT
+# =====================================================
+# Clé secrète : doit faire AU MOINS 32 caractères (HS256)
+jwt.secret=MaCleSecreteSuperLongueDe32CaracteresMinimum123456
+# Durée de validité du token en millisecondes (ex: 24h = 86400000)
+jwt.expiration=86400000

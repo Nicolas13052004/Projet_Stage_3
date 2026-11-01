@@ -1,0 +1,1 @@
+UPDATE agent SET mot_de_passe_hash = '\\\' WHERE email IN ('agent@safidy.mg','resp@safidy.mg');

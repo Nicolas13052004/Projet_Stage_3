@@ -19,6 +19,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
+        // --- LIGNES DE DÉBOGAGE AJOUTÉES ICI ---
+        System.out.println("==================================================");
+        System.out.println(">>> ERREUR ATTRAPÉE PAR SPRING : " + ex.getMessage());
+        ex.printStackTrace();
+        System.out.println("==================================================");
+
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR,
                 ex.getMessage() == null ? "Erreur interne" : ex.getMessage());
     }

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Card,
   Row,
   Col,
   Statistic,
@@ -64,7 +63,7 @@ export default function Dashboard() {
 
   const annee = new Date().getFullYear();
   const heure = new Date().getHours();
-  const salutation = heure < 12 ? 'Bonjour' : heure < 18 ? 'Bon apres-midi' : 'Bonsoir';
+  const salutation = heure < 12 ? 'Bonjour' : heure < 18 ? 'Bon après-midi' : 'Bonsoir';
 
   const impayesTries = [...(impayes || [])]
     .sort((a, b) => (b.resteAPayer || 0) - (a.resteAPayer || 0))
@@ -78,19 +77,19 @@ export default function Dashboard() {
         <div>
           <Text strong>{r.raisonSociale}</Text>
           <br />
-          <Text type="secondary">{r.nif}</Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>{r.nif}</Text>
         </div>
       ),
     },
     {
-      title: 'IR du',
+      title: 'IR dû',
       dataIndex: 'irDu',
       key: 'irDu',
       align: 'right',
       render: (v) => formatAr(v),
     },
     {
-      title: 'Reste a payer',
+      title: 'Reste à payer',
       dataIndex: 'resteAPayer',
       key: 'reste',
       align: 'right',
@@ -115,11 +114,11 @@ export default function Dashboard() {
   const colonnesEcheances = [
     { title: 'Contribuable', dataIndex: 'raisonSociale', key: 'rs' },
     {
-      title: 'Annee / n',
+      title: 'Année / n',
       key: 'ref',
       render: (_, a) => `${a.annee} n°${a.numero}`,
     },
-    { title: 'Echeance', dataIndex: 'dateEcheance', key: 'echeance' },
+    { title: 'Échéance', dataIndex: 'dateEcheance', key: 'echeance' },
     {
       title: 'Montant',
       dataIndex: 'montant',
@@ -138,8 +137,9 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="page">
-      <div className="page-header">
+    <div className="page-container">
+      {/* En-tête */}
+      <div className="page-header-card glass-card">
         <div>
           <h1 className="page-title">Tableau de bord</h1>
           <p className="page-subtitle">
@@ -148,91 +148,94 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {error && <Alert type="error" showIcon message={error} />}
+      {error && <Alert type="error" showIcon message={error} className="glass-card" />}
 
       {stats && (
         <>
+          {/* Ligne 1 : Stats globales */}
           <Row gutter={[16, 16]}>
             <Col xs={12} md={6}>
-              <Card>
+              <div className="glass-card">
                 <Statistic
                   title="Contribuables"
                   value={stats.contribuables}
                   prefix={<TeamOutlined style={{ color: '#0E7A55' }} />}
                 />
-              </Card>
+              </div>
             </Col>
             <Col xs={12} md={6}>
-              <Card>
+              <div className="glass-card">
                 <Statistic
-                  title="Declarations IR"
+                  title="Déclarations IR"
                   value={stats.declarations}
                   prefix={<FileTextOutlined style={{ color: '#0369A1' }} />}
                 />
-              </Card>
+              </div>
             </Col>
             <Col xs={12} md={6}>
-              <Card>
+              <div className="glass-card">
                 <Statistic
                   title="Paiements"
                   value={stats.paiements}
                   prefix={<CreditCardOutlined style={{ color: '#16A34A' }} />}
                 />
-              </Card>
+              </div>
             </Col>
             <Col xs={12} md={6}>
-              <Card>
+              <div className="glass-card">
                 <Statistic
                   title="Acomptes"
                   value={stats.acomptes}
                   prefix={<CalendarOutlined style={{ color: '#EA580C' }} />}
                 />
-              </Card>
+              </div>
             </Col>
           </Row>
 
+          {/* Ligne 2 : Montants */}
           <Row gutter={[16, 16]}>
-            <Col xs={24} md={8} lg={4} xl={4}>
-              <Card>
-                <Statistic title={`IR total du (${annee})`} value={stats.irTotal} precision={0} suffix="Ar" valueStyle={{ fontSize: 18 }} />
-              </Card>
+            <Col xs={24} md={8} lg={5}>
+              <div className="glass-card">
+                <Statistic title={`IR total dû (${annee})`} value={stats.irTotal} precision={0} suffix="Ar" valueStyle={{ fontSize: 18 }} />
+              </div>
             </Col>
-            <Col xs={24} md={8} lg={5} xl={5}>
-              <Card>
+            <Col xs={24} md={8} lg={5}>
+              <div className="glass-card">
                 <Statistic
-                  title="Total encaisse"
+                  title="Total encaissé"
                   value={stats.encaisse}
                   precision={0}
                   suffix="Ar"
                   valueStyle={{ color: '#16A34A', fontSize: 18 }}
                 />
-              </Card>
+              </div>
             </Col>
-            <Col xs={24} md={8} lg={5} xl={5}>
-              <Card>
+            <Col xs={24} md={8} lg={5}>
+              <div className="glass-card">
                 <Statistic
-                  title="Reste a payer"
+                  title="Reste à payer"
                   value={stats.soldeAPayer}
                   precision={0}
                   suffix="Ar"
                   valueStyle={{ color: '#EA580C', fontSize: 18 }}
                 />
-              </Card>
+              </div>
             </Col>
-            <Col xs={12} md={6} lg={5} xl={5}>
-              <Card>
+            <Col xs={12} md={6} lg={5}>
+              <div className="glass-card">
                 <Statistic
-                  title="Contribuables en retard"
+                  title="En retard"
                   value={
                     alertes ? alertes.nbContribuablesEnRetard : stats.nbEnRetard || 0
                   }
                   prefix={<WarningOutlined style={{ color: '#DC2626' }} />}
                   valueStyle={{ color: '#DC2626', fontSize: 18 }}
                 />
-              </Card>
+              </div>
             </Col>
-            <Col xs={12} md={6} lg={5} xl={5}>
-              <Card title="Taux de recouvrement" size="small">
+            <Col xs={12} md={6} lg={4}>
+              <div className="glass-card">
+                <div style={{ fontSize: 14, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>Taux de recouvrement</div>
                 <Text strong style={{ fontSize: 18 }}>
                   {stats.tauxRecouvrement} %
                 </Text>
@@ -242,74 +245,73 @@ export default function Dashboard() {
                   strokeColor="#0E7A55"
                   size="small"
                 />
-              </Card>
+              </div>
             </Col>
           </Row>
 
+          {/* Ligne 3 : Graphiques */}
           <Row gutter={[16, 16]}>
             <Col xs={24} lg={14}>
-              <BarChartCard
-                titre="IR du par annee"
-                data={parAnnee}
-                cleX="annee"
-                series={[
-                  { dataKey: 'irDu', name: 'IR du', couleur: '#0E7A55' },
-                  { dataKey: 'soldeAPayer', name: 'Solde a payer', couleur: '#F59E0B' },
-                ]}
-              />
+              <div className="glass-card" style={{ height: '100%' }}>
+                <BarChartCard
+                  titre="IR dû par année"
+                  data={parAnnee}
+                  cleX="annee"
+                  series={[
+                    { dataKey: 'irDu', name: 'IR dû', couleur: '#0E7A55' },
+                    { dataKey: 'soldeAPayer', name: 'Solde à payer', couleur: '#F59E0B' },
+                  ]}
+                />
+              </div>
             </Col>
             <Col xs={24} lg={10}>
-              <PieChartCard
-                titre="Declarations par statut"
-                data={parStatut}
-                cleNom="statut"
-                cleValeur="nombre"
-              />
+              <div className="glass-card" style={{ height: '100%' }}>
+                <PieChartCard
+                  titre="Déclarations par statut"
+                  data={parStatut}
+                  cleNom="statut"
+                  cleValeur="nombre"
+                />
+              </div>
             </Col>
           </Row>
 
+          {/* Ligne 4 : Alertes et impayés */}
           {(alertes || impayes) && (
             <Row gutter={[16, 16]}>
               <Col xs={24} lg={12}>
-                <Card
-                  title={
-                    <span>
-                      <WarningOutlined style={{ color: '#DC2626', marginRight: 8 }} />
-                      Top 5 des impayes (
-                      {formatAr((impayes || []).reduce((t, i) => t + (i.resteAPayer || 0), 0))} a
-                      recouvrer)
-                    </span>
-                  }
-                >
+                <div className="glass-card">
+                  <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, fontSize: 16 }}>
+                    <WarningOutlined style={{ color: '#DC2626' }} />
+                    Top 5 des impayés (
+                    {formatAr((impayes || []).reduce((t, i) => t + (i.resteAPayer || 0), 0))} à recouvrer)
+                  </h3>
                   <Table
                     size="small"
                     rowKey="idDeclaration"
                     columns={colonnesImpayes}
                     dataSource={impayesTries}
                     pagination={false}
-                    locale={{ emptyText: 'Aucun impaye' }}
+                    locale={{ emptyText: 'Aucun impayé' }}
                   />
-                </Card>
+                </div>
               </Col>
               <Col xs={24} lg={12}>
                 {alertes && (
-                <Card
-                  title={
-                    <span>
-                      <ClockCircleOutlined style={{ color: '#F59E0B', marginRight: 8 }} />
-                      Echeances dans les 30 jours ({alertes.acomptesAvenir.length})
-                    </span>
-                  }
-                >
+                <div className="glass-card">
+                  <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, fontSize: 16 }}>
+                    <ClockCircleOutlined style={{ color: '#F59E0B' }} />
+                    Échéances dans les 30 jours ({alertes.acomptesAvenir.length})
+                  </h3>
                   <Table
                     size="small"
                     rowKey="idAcompte"
                     columns={colonnesEcheances}
                     dataSource={alertes.acomptesAvenir}
                     pagination={false}
-                    locale={{ emptyText: 'Aucune echeance imminente' }}
+                    locale={{ emptyText: 'Aucune échéance imminente' }}
                   />
-                </Card>
+                </div>
                 )}
               </Col>
             </Row>

@@ -1,5 +1,6 @@
 package mg.safidy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -48,6 +49,8 @@ public class Contribuable {
     @Column(name = "email", length = 120)
     private String email;
 
+    // AJOUT DE @JsonIgnore ICI
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_secteur", nullable = false)
     private SecteurActivite secteur;
@@ -64,10 +67,14 @@ public class Contribuable {
     @Column(name = "statut", nullable = false, length = 20)
     private String statut;
 
+    // AJOUT DE @JsonIgnore ICI
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_centre", nullable = false)
     private CentreFiscal centre;
 
+    // AJOUT DE @JsonIgnore ICI (C'est celui qui causait l'erreur Agent#2)
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_agent", nullable = false)
     private Agent agent;
@@ -77,6 +84,8 @@ public class Contribuable {
 
     public Contribuable() {
     }
+
+    // --- GETTERS ET SETTERS ---
 
     public Long getIdContribuable() {
         return idContribuable;

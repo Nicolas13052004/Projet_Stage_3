@@ -1,8 +1,16 @@
 package mg.safidy.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LoginRequest {
 
     private String email;
+
+    @JsonProperty("motDePasse")
+    @JsonAlias({"password", "motdepasse", "mot_de_passe"})
     private String motDePasse;
 
     public LoginRequest() {
@@ -22,5 +30,9 @@ public class LoginRequest {
 
     public void setMotDePasse(String motDePasse) {
         this.motDePasse = motDePasse;
+    }
+
+    public void setPassword(String password) {
+        this.motDePasse = password;
     }
 }

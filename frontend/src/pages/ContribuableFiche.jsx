@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Card,
   Row,
   Col,
   Statistic,
@@ -55,13 +54,15 @@ export default function ContribuableFiche() {
   }, [id]);
 
   if (loading) return <LoadingBlock message="Chargement de la fiche..." />;
+  
   if (error) {
     return (
-      <div className="page">
-        <Alert type="error" showIcon message={error} />
+      <div className="page-container">
+        <Alert type="error" showIcon message={error} className="glass-card" />
       </div>
     );
   }
+  
   if (!contribuable) return null;
 
   const statutFiscal = (() => {
@@ -188,31 +189,31 @@ export default function ContribuableFiche() {
   const paiements = situation?.paiements || [];
 
   return (
-    <div className="page">
-      <div className="page-header">
-        <div>
-          <Button
-            type="link"
-            icon={<ArrowLeftOutlined />}
-            onClick={() => navigate('/contribuables')}
-            style={{ paddingLeft: 0 }}
-          >
-            Retour a la liste
-          </Button>
-        </div>
+    <div className="page-container">
+      {/* BOUTON RETOUR */}
+      <div className="page-header-card glass-card">
+        <Button
+          type="link"
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate('/contribuables')}
+          style={{ paddingLeft: 0, fontWeight: 600 }}
+        >
+          Retour a la liste
+        </Button>
       </div>
 
-      <Card style={{ marginBottom: 16 }}>
+      {/* EN-TÊTE CONTRIBUABLE */}
+      <div className="glass-card">
         <Row gutter={[16, 16]} align="middle" justify="space-between">
           <Col>
             <Space size={16} align="center">
-              <Avatar size={56} icon={<UserOutlined />} style={{ backgroundColor: '#0E7A55' }} />
+              <Avatar size={64} icon={<UserOutlined />} style={{ backgroundColor: '#0E7A55' }} />
               <div>
-                <Title level={4} style={{ margin: 0 }}>
+                <Title level={3} style={{ margin: 0, color: '#0a2c22' }}>
                   {contribuable.raisonSociale}
                 </Title>
-                <Space size={8} wrap style={{ marginTop: 4 }}>
-                  <Tag color="green">NIF {contribuable.nif}</Tag>
+                <Space size={8} wrap style={{ marginTop: 6 }}>
+                  <Tag color="green" style={{ fontWeight: 'bold' }}>NIF {contribuable.nif}</Tag>
                   <Text type="secondary">{contribuable.formeJuridique}</Text>
                   {contribuable.secteur && (
                     <Text type="secondary">— {contribuable.secteur.libelle}</Text>
@@ -232,71 +233,67 @@ export default function ContribuableFiche() {
             </Space>
           </Col>
         </Row>
-      </Card>
+      </div>
 
+      {/* STATISTIQUES FISCALES */}
       {situation && (
-        <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+        <Row gutter={[16, 16]}>
           <Col xs={12} md={6}>
-            <Card>
+            <div className="glass-card">
               <Statistic
                 title="Total IR du"
                 value={formatAr(situation.totalDu)}
                 valueStyle={{ fontSize: 18, color: '#0369A1' }}
               />
-            </Card>
+            </div>
           </Col>
           <Col xs={12} md={6}>
-            <Card>
+            <div className="glass-card">
               <Statistic
                 title="Total paye"
                 value={formatAr(situation.totalPaye)}
                 valueStyle={{ fontSize: 18, color: '#16A34A' }}
               />
-            </Card>
+            </div>
           </Col>
           <Col xs={12} md={6}>
-            <Card>
+            <div className="glass-card">
               <Statistic
                 title="Reste a payer"
                 value={formatAr(situation.resteAPayer)}
                 valueStyle={{ fontSize: 18, color: '#EA580C' }}
               />
-            </Card>
+            </div>
           </Col>
           <Col xs={12} md={6}>
-            <Card>
+            <div className="glass-card">
               <Statistic
                 title="Declarations impayees"
                 value={situation.nbDeclarationsImpayees}
                 valueStyle={{ fontSize: 18, color: '#DC2626' }}
               />
-            </Card>
+            </div>
           </Col>
         </Row>
       )}
 
+      {/* INFORMATIONS + DECLARATIONS */}
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={10}>
-          <Card
-            title={
-              <span>
-                <UserOutlined style={{ marginRight: 8, color: '#0E7A55' }} />
-                Informations generales
-              </span>
-            }
-          >
+          <div className="glass-card" style={{ height: '100%' }}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontSize: 16, color: '#0a2c22' }}>
+              <UserOutlined style={{ color: '#0E7A55' }} />
+              Informations generales
+            </h3>
             <Descriptions column={1} size="small" items={infosItems} />
-          </Card>
+          </div>
         </Col>
         <Col xs={24} lg={14}>
-          <Card
-            title={
-              <span>
-                <FileTextOutlined style={{ marginRight: 8, color: '#0369A1' }} />
-                Declarations ({declarations.length})
-              </span>
-            }
-          >
+          <div className="glass-card" style={{ height: '100%' }}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontSize: 16, color: '#0a2c22' }}>
+              <FileTextOutlined style={{ color: '#0369A1' }} />
+              Declarations ({declarations.length})
+            </h3>
             <Table
               rowKey="idDeclaration"
               size="small"
@@ -305,32 +302,26 @@ export default function ContribuableFiche() {
               pagination={false}
               locale={{ emptyText: 'Aucune declaration' }}
             />
-          </Card>
+          </div>
         </Col>
       </Row>
 
-      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <Col xs={24}>
-          <Card
-            title={
-              <span>
-                <CreditCardOutlined style={{ marginRight: 8, color: '#16A34A' }} />
-                Paiements ({paiements.length})
-              </span>
-            }
-          >
-            <Table
-              rowKey="idPaiement"
-              size="small"
-              columns={colonnesPaiements}
-              dataSource={paiements}
-              pagination={false}
-              locale={{ emptyText: 'Aucun paiement' }}
-              onRow={(p) => ({ style: { opacity: p.annule ? 0.5 : 1 } })}
-            />
-          </Card>
-        </Col>
-      </Row>
+      {/* PAIEMENTS */}
+      <div className="glass-card">
+        <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontSize: 16, color: '#0a2c22' }}>
+          <CreditCardOutlined style={{ color: '#16A34A' }} />
+          Paiements ({paiements.length})
+        </h3>
+        <Table
+          rowKey="idPaiement"
+          size="small"
+          columns={colonnesPaiements}
+          dataSource={paiements}
+          pagination={false}
+          locale={{ emptyText: 'Aucun paiement' }}
+          onRow={(p) => ({ style: { opacity: p.annule ? 0.5 : 1 } })}
+        />
+      </div>
     </div>
   );
 }

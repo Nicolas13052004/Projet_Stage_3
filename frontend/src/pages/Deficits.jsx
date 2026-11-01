@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   Button,
-  Card,
   Col,
   Descriptions,
   Modal,
@@ -155,8 +154,9 @@ export default function Deficits() {
   ];
 
   return (
-    <div className="page">
-      <div className="page-header">
+    <div className="page-container">
+      {/* EN-TÊTE */}
+      <div className="page-header-card glass-card">
         <div>
           <h1 className="page-title">Deficits</h1>
           <p className="page-subtitle">
@@ -165,18 +165,19 @@ export default function Deficits() {
         </div>
       </div>
 
+      {/* STATISTIQUES */}
       <Row gutter={[16, 16]}>
         <Col xs={12} md={6}>
-          <Card>
+          <div className="glass-card">
             <Statistic
               title="Deficits actifs"
               value={deficitsActifs}
               prefix={<FallOutlined style={{ color: '#0E7A55' }} />}
             />
-          </Card>
+          </div>
         </Col>
         <Col xs={12} md={6}>
-          <Card>
+          <div className="glass-card">
             <Statistic
               title="Total disponible"
               value={totalDisponible}
@@ -185,10 +186,10 @@ export default function Deficits() {
               prefix={<DollarOutlined style={{ color: '#16A34A' }} />}
               valueStyle={{ color: '#16A34A' }}
             />
-          </Card>
+          </div>
         </Col>
         <Col xs={12} md={6}>
-          <Card>
+          <div className="glass-card">
             <Statistic
               title="Montant initial"
               value={montantInitial}
@@ -196,20 +197,21 @@ export default function Deficits() {
               suffix="Ar"
               prefix={<WarningOutlined style={{ color: '#EA580C' }} />}
             />
-          </Card>
+          </div>
         </Col>
         <Col xs={12} md={6}>
-          <Card>
+          <div className="glass-card">
             <Statistic
               title="Total deficits"
               value={liste.length}
               prefix={<CalendarOutlined style={{ color: '#0369A1' }} />}
             />
-          </Card>
+          </div>
         </Col>
       </Row>
 
-      <div className="toolbar">
+      {/* BARRE D'OUTILS */}
+      <div className="toolbar-card glass-card">
         <SearchBar
           value={recherche}
           onChange={setRecherche}
@@ -233,35 +235,42 @@ export default function Deficits() {
         </div>
       </div>
 
+      {/* TABLEAU */}
       {loading ? (
-        <LoadingBlock message="Chargement des deficits..." />
+        <div className="glass-card">
+          <LoadingBlock message="Chargement des deficits..." />
+        </div>
       ) : (
-        <Table
-          rowKey="idDeficit"
-          size="small"
-          columns={colonnes}
-          dataSource={listeFiltree}
-          scroll={{ x: 980 }}
-          pagination={{
-            pageSize: 12,
-            showSizeChanger: true,
-            showTotal: (total) => `${total} resultat(s)`,
-          }}
-          locale={{
-            emptyText: (
-              <EmptyState
-                titre="Aucun deficit"
-                texte="Les deficits sont crees automatiquement lors des declarations deficitaires"
-              />
-            ),
-          }}
-        />
+        <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+          <Table
+            rowKey="idDeficit"
+            size="small"
+            columns={colonnes}
+            dataSource={listeFiltree}
+            scroll={{ x: 980 }}
+            pagination={{
+              pageSize: 12,
+              showSizeChanger: true,
+              showTotal: (total) => `${total} resultat(s)`,
+              style: { padding: '0 16px' }
+            }}
+            locale={{
+              emptyText: (
+                <EmptyState
+                  titre="Aucun deficit"
+                  texte="Les deficits sont crees automatiquement lors des declarations deficitaires"
+                />
+              ),
+            }}
+          />
+        </div>
       )}
 
-      <Text type="secondary" style={{ fontSize: 12 }}>
+      <Text type="secondary" style={{ fontSize: 12, textAlign: 'right', display: 'block' }}>
         {listeFiltree.length} resultat(s)
       </Text>
 
+      {/* MODAL DETAIL */}
       <Modal
         open={!!detail}
         title="Detail du deficit"

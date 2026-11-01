@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Card, Row, Col, Button, Modal, Form, Input, Select, Tabs } from 'antd';
+import { Row, Col, Button, Modal, Form, Input, Select, Tabs } from 'antd';
 import {
   PauseCircleOutlined,
   PlayCircleOutlined,
@@ -218,34 +218,43 @@ export default function Suspensions() {
   ];
 
   return (
-    <div className="page">
-      <div className="page-header">
+    <div className="page-container">
+      {/* EN-TÊTE */}
+      <div className="page-header-card glass-card">
         <div>
           <h1 className="page-title">Arret / reprise d activite</h1>
           <p className="page-subtitle">Veilleuse, cessation definitive et reprise</p>
         </div>
       </div>
 
-      <Card size="small" style={{ marginBottom: 16 }}>
+      {/* RECHERCHE CONTRIBUABLE */}
+      <div className="toolbar-card glass-card">
         <ContribuableRecherche
           contribuables={contribuables}
           value={selected}
           onChange={(id) => setSelected(id)}
         />
-      </Card>
+      </div>
 
       {!selected ? (
-        <EmptyState
-          titre="Selectionnez un contribuable"
-          texte="Choisissez un contribuable pour gerer son activite"
-        />
+        <div className="glass-card" style={{ padding: 48 }}>
+          <EmptyState
+            titre="Selectionnez un contribuable"
+            texte="Choisissez un contribuable pour gerer son activite"
+          />
+        </div>
       ) : loading ? (
-        <LoadingBlock message="Chargement..." />
+        <div className="glass-card" style={{ padding: 48 }}>
+          <LoadingBlock message="Chargement..." />
+        </div>
       ) : (
         <>
+          {/* BANNIÈRE DE STATUT */}
           <Row gutter={[16, 16]} align="middle" style={{ marginBottom: 16 }}>
             <Col xs={24} md={18}>
-              <StatutBanner statut={statutActuel} moisActifs={situation?.moisActifs} />
+              <div className="glass-card" style={{ padding: '16px 24px' }}>
+                <StatutBanner statut={statutActuel} moisActifs={situation?.moisActifs} />
+              </div>
             </Col>
             {(statutActuel === 'ACTIF' || statutActuel === 'SUSPENDU') && (
               <Col xs={24} md={6} style={{ textAlign: 'right' }}>
@@ -259,6 +268,7 @@ export default function Suspensions() {
                     )
                   }
                   onClick={demanderChangementStatut}
+                  style={{ width: '100%', height: 50 }}
                 >
                   {statutActuel === 'ACTIF' ? 'Suspendre' : 'Reactiver'}
                 </Button>
@@ -266,9 +276,10 @@ export default function Suspensions() {
             )}
           </Row>
 
-          <Card>
+          {/* CONTENU (ONGLETS) */}
+          <div className="glass-card">
             <Tabs defaultActiveKey="declaration" items={onglets} />
-          </Card>
+          </div>
         </>
       )}
 

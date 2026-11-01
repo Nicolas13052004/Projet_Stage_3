@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   Button,
-  Card,
   Col,
   Form,
   Row,
@@ -278,8 +277,9 @@ export default function Penalites() {
   ];
 
   return (
-    <div className="page">
-      <header className="page-header">
+    <div className="page-container">
+      {/* EN-TÊTE */}
+      <div className="page-header-card glass-card">
         <div>
           <h1 className="page-title">Penalites</h1>
           <p className="page-subtitle">
@@ -295,10 +295,11 @@ export default function Penalites() {
             Exporter Excel
           </Button>
         </div>
-      </header>
+      </div>
 
-      <Card size="small">
-        <Form layout="vertical">
+      {/* FILTRES */}
+      <div className="toolbar-card glass-card">
+        <Form layout="vertical" style={{ width: '100%' }}>
           <Row gutter={[12, 8]}>
             <Col xs={24} md={9}>
               <Form.Item label="Contribuable" style={{ marginBottom: 0 }}>
@@ -341,21 +342,24 @@ export default function Penalites() {
             </Col>
           </Row>
         </Form>
-      </Card>
+      </div>
 
       {!selected ? (
-        <EmptyState
-          icone={<WarningOutlined style={{ fontSize: 32, color: '#EA580C' }} />}
-          titre="Selectionnez un contribuable"
-          texte="Choisissez un contribuable pour afficher ses penalites"
-        />
+        <div className="glass-card" style={{ padding: 48 }}>
+          <EmptyState
+            icone={<WarningOutlined style={{ fontSize: 32, color: '#EA580C' }} />}
+            titre="Selectionnez un contribuable"
+            texte="Choisissez un contribuable pour afficher ses penalites"
+          />
+        </div>
       ) : loading ? (
-        <>
+        <div className="glass-card">
           <SkeletonStatsGrid count={3} />
           <SkeletonTable rows={4} cols={8} />
-        </>
+        </div>
       ) : (
         <>
+          {/* STATISTIQUES */}
           <Row gutter={[16, 16]}>
             <Col xs={12} md={8}>
               <PenaliteCard
@@ -386,23 +390,33 @@ export default function Penalites() {
             </Col>
           </Row>
 
-          <Card
-            size="small"
-            title="Historique des penalites"
-            extra={<span className="muted">{penalitesFiltrees.length} resultat(s)</span>}
-          >
+          {/* TABLEAU */}
+          <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 24px', borderBottom: '1px solid #f0f0f0' }}>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#0a2c22' }}>
+                Historique des penalites
+              </h3>
+              <span className="muted">{penalitesFiltrees.length} resultat(s)</span>
+            </div>
+            
             {penalitesFiltrees.length === 0 ? (
-              <EmptyState
-                titre="Aucune penalite"
-                texte="Aucune penalite ne correspond aux filtres selectionnes."
-              />
+              <div style={{ padding: 40 }}>
+                <EmptyState
+                  titre="Aucune penalite"
+                  texte="Aucune penalite ne correspond aux filtres selectionnes."
+                />
+              </div>
             ) : (
               <Table
                 rowKey="idPenalite"
                 size="medium"
                 columns={colonnes}
                 dataSource={penalitesFiltrees}
-                pagination={{ pageSize: 10, showSizeChanger: true }}
+                pagination={{ 
+                  pageSize: 10, 
+                  showSizeChanger: true,
+                  style: { padding: '0 16px' }
+                }}
                 locale={{ emptyText: 'Aucune penalite' }}
                 expandable={{
                   expandedRowKeys: expandes,
@@ -412,7 +426,7 @@ export default function Penalites() {
                 }}
               />
             )}
-          </Card>
+          </div>
         </>
       )}
 

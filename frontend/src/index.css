@@ -2,401 +2,123 @@
    Safidy - style global (Ant Design + habillage maison)
    ===================================================== */
 
-* {
-  box-sizing: border-box;
-}
-
-html,
-body,
-#root {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background: #f3f6f8;
-  color: #1b2b2a;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ---------- Layout ---------- */
-.app-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-inline: 16px;
-  background: #fff;
-  box-shadow: 0 1px 0 rgba(15, 40, 32, 0.08);
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-
-.app-header-title {
-  font-size: 16px;
-}
-
-.app-header-user-name {
-  font-size: 13px;
-}
-
-.app-content {
-  padding: 20px;
-  min-height: calc(100vh - 64px);
-}
-
-@media (max-width: 992px) {
-  .app-content {
-    padding: 14px;
-  }
-}
-
-/* ---------- Sidebar ---------- */
-.side-menu {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.side-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px;
-  min-height: 64px;
-}
-
-.side-brand-logo {
-  width: 34px;
-  height: 34px;
-  flex-shrink: 0;
-  border-radius: 9px;
-  background: linear-gradient(135deg, #0e7a55, #16a34a);
-  color: #fff;
-  font-weight: 700;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  letter-spacing: 0.5px;
-}
-
-.side-brand-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.15;
-  white-space: nowrap;
-}
-
-.side-brand-text strong {
-  color: #fff;
-  font-size: 15px;
-}
-
-.side-brand-text span {
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 11px;
-}
-
-.side-footer {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.side-agent {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  flex: 1;
-}
-
-.side-agent .ant-typography {
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ---------- Pages ---------- */
-.page {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.page-title {
-  margin: 0;
-  font-size: 19px;
-  font-weight: 700;
-  color: #0a2c22;
-}
-
-.page-subtitle {
-  margin: 2px 0 0;
-  font-size: 13px;
-  color: #6b7f7a;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.section-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #0a2c22;
-  margin: 0;
-}
-
-/* ---------- Divers ---------- */
-.stat-label {
-  font-size: 12px;
-  color: #6b7f7a;
-}
-
-.muted {
-  color: #6b7f7a;
-}
-
-.text-right {
-  text-align: right;
-}
-
-.mono {
-  font-variant-numeric: tabular-nums;
-}
-
-/* ---------- Login (glassmorphism, form centre) ---------- */
-.login-page {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 20px;
-  overflow: hidden;
-  isolation: isolate;
-  background:
-    radial-gradient(circle at 15% 20%, rgba(14, 122, 85, 0.35), transparent 45%),
-    linear-gradient(135deg, #041e33 0%, #0a3d5c 48%, #0b4a3a 76%, #0e7a55 100%);
-}
-
-/* trame technique discrète */
-.login-page::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 28px 28px;
-  mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
-  z-index: -2;
-}
-
-/* formes 3D abstraites */
-.login-shape {
-  position: absolute;
-  z-index: -1;
-  opacity: 0.55;
-  filter: blur(2px);
-}
-
-.login-shape-1 {
-  width: 300px;
-  height: 300px;
-  top: -70px;
-  left: -60px;
-  border-radius: 42% 58% 63% 37% / 45% 38% 62% 55%;
-  background: linear-gradient(145deg, rgba(59, 130, 246, 0.45), rgba(14, 122, 85, 0.15));
-  box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.18);
-}
-
-.login-shape-2 {
-  width: 380px;
-  height: 380px;
-  right: -110px;
-  bottom: -120px;
-  border-radius: 63% 37% 41% 59% / 43% 59% 41% 57%;
-  background: linear-gradient(145deg, rgba(14, 122, 85, 0.5), rgba(3, 105, 161, 0.25));
-  box-shadow: inset 0 0 70px rgba(255, 255, 255, 0.15);
-}
-
-.login-shape-3 {
-  width: 170px;
-  height: 170px;
-  right: 14%;
-  top: 12%;
-  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.28), rgba(59, 130, 246, 0.12));
-  filter: blur(1px);
-}
-
-.login-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 22px;
-  width: min(440px, 100%);
-}
-
-.login-brand {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  text-align: center;
-}
-
-.login-brand-title {
-  color: #fff !important;
-  margin: 0 !important;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-}
-
-.login-brand-text {
-  color: rgba(255, 255, 255, 0.78) !important;
-  max-width: 360px;
-  margin: 0 !important;
-  font-size: 14px;
-}
-
-.login-card {
-  width: 100%;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  box-shadow: 0 24px 60px rgba(2, 20, 35, 0.35);
-}
-
-.login-card .ant-card-body {
-  padding: 28px 28px 26px;
-}
-
-.login-card-title {
-  margin: 0 !important;
-}
-
-/* champs de saisie */
-.login-card .ant-form-item {
-  margin-bottom: 18px;
-}
-
-.login-card .ant-form-item-label > label {
-  color: #0a2c22;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.login-card .ant-input-affix-wrapper {
-  min-height: 46px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: #f6faf9;
-  border: 1px solid #d3e0dc;
-}
-
-.login-card .ant-input-affix-wrapper .ant-input {
-  background: transparent;
-  font-size: 15px;
-}
-
-.login-card .ant-input-affix-wrapper:hover {
-  border-color: #0e7a55;
-}
-
-.login-card .ant-input-affix-wrapper-focused {
-  background: #fff;
-  border-color: #0e7a55;
-  box-shadow: 0 0 0 3px rgba(14, 122, 85, 0.15);
-}
-
-.login-options {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 20px;
-  font-size: 14px;
-}
-
-.login-options .ant-checkbox-wrapper {
-  color: #334b46;
-}
-
-.login-forgot {
-  color: #0e7a55;
-  font-weight: 500;
-}
-
-.login-forgot:hover {
-  color: #0a5e41;
-}
-
-.login-submit {
-  min-height: 46px;
-  border-radius: 10px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #0e7a55, #16a34a);
-  border: none;
-}
-
-.login-submit:hover,
-.login-submit:focus {
-  background: linear-gradient(135deg, #0a5e41, #128c3e);
-}
-
-.login-footer {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 12px;
-  letter-spacing: 0.4px;
-  margin: 0 !important;
-}
-
-@media (max-width: 600px) {
-  .login-card .ant-card-body {
-    padding: 22px 18px 20px;
-  }
-  .login-options {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-}
-
-/* Scrollbars discrets */
-::-webkit-scrollbar {
-  width: 9px;
-  height: 9px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd7d3;
-  border-radius: 6px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a9bcb6;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+   * { box-sizing: border-box; }
+   html, body, #root { height: 100%; }
+   
+   body {
+     margin: 0;
+     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+     background: #f3f6f8;
+     color: #1b2b2a;
+     -webkit-font-smoothing: antialiased;
+   }
+   
+   /* ---------- Layout (Global) ---------- */
+   .app-content { padding: 24px; min-height: calc(100vh - 64px); }
+   @media (max-width: 992px) { .app-content { padding: 14px; } }
+   
+   /* ---------- Pages (Cartes de verre) ---------- */
+   .page-container { display: flex; flex-direction: column; gap: 24px; }
+   
+   .glass-card {
+     background: #ffffff;
+     border-radius: 16px;
+     padding: 24px;
+     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
+     border: 1px solid rgba(14, 122, 85, 0.05);
+   }
+   
+   .page-header-card {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     flex-wrap: wrap;
+     gap: 16px;
+     background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(243,246,248,0.8));
+     backdrop-filter: blur(10px);
+   }
+   
+   .page-title { margin: 0; font-size: 24px; font-weight: 800; color: #0a2c22; letter-spacing: -0.5px; }
+   .page-subtitle { margin: 4px 0 0; font-size: 14px; color: #6b7f7a; }
+   
+   .toolbar-card { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 16px 24px; }
+   
+   /* Tableaux */
+   .ant-table-wrapper { background: transparent; }
+   .ant-table-thead > tr > th { background: #f8fafc !important; color: #0E7A55 !important; font-weight: 600; border-bottom: 2px solid rgba(14, 122, 85, 0.1) !important; }
+   .ant-table-tbody > tr > td { border-bottom: 1px solid #f0f0f0; color: #334155; }
+   .ant-table-tbody > tr:hover > td { background-color: #f0fdf4 !important; }
+   
+   /* Boutons */
+   .ant-btn-primary { background-color: #0E7A55; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 10px rgba(14, 122, 85, 0.2); }
+   .ant-btn-primary:hover { background-color: #0a5e41 !important; }
+   
+   /* Utilitaires */
+   .stat-label { font-size: 12px; color: #6b7f7a; }
+   .muted { color: #6b7f7a; }
+   .text-right { text-align: right; }
+   .mono { font-variant-numeric: tabular-nums; }
+   
+   /* =====================================================
+      LOGIN SPLIT-SCREEN (Design moderne)
+      ===================================================== */
+   .split-login-container { display: flex; min-height: 100vh; width: 100%; background: #fff; }
+   .split-login-left { display: none; flex: 1; position: relative; background: linear-gradient(135deg, #041e33 0%, #0a3d5c 50%, #0e7a55 100%); overflow: hidden; color: #fff; }
+   @media (min-width: 900px) { .split-login-left { display: flex; flex-direction: column; justify-content: center; align-items: center; } }
+   .login-waves { position: absolute; top: 0; right: -80px; width: 160px; height: 100%; background-color: #f8fafc; z-index: 1; border-top-left-radius: 50% 20%; border-bottom-left-radius: 50% 20%; box-shadow: -10px 0 20px rgba(0,0,0,0.1); }
+   .split-left-content { position: relative; z-index: 2; padding: 60px; max-width: 500px; display: flex; flex-direction: column; height: 100%; justify-content: center; align-items: center; text-align: center; }
+   .brand-wrapper { margin-bottom: auto; margin-top: 80px; display: flex; flex-direction: column; align-items: center; }
+   .brand-wrapper img { background-color: white; padding: 12px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+   .left-footer-text { margin-top: auto; margin-bottom: 40px; font-size: 14px; opacity: 0.8; }
+   .split-login-right { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; background: #f8fafc; }
+   .form-wrapper { width: 100%; max-width: 420px; background: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04); }
+   .form-header { margin-bottom: 32px; text-align: center; }
+   .form-header h3 { margin-bottom: 8px !important; color: #0a2c22; font-weight: 700; }
+   .modern-form .ant-form-item-label > label { font-weight: 600; color: #334155; }
+   .modern-form .ant-input-affix-wrapper { padding: 10px 14px; border-radius: 12px; border: 2px solid #e2e8f0; background: #f8fafc; transition: all 0.3s; }
+   .modern-form .ant-input-affix-wrapper:hover, .modern-form .ant-input-affix-wrapper-focused { border-color: #0E7A55; background: #fff; box-shadow: 0 0 0 4px rgba(14, 122, 85, 0.1); }
+   .form-options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-size: 14px; }
+   .forgot-link { color: #0E7A55; font-weight: 500; }
+   .forgot-link:hover { text-decoration: underline; }
+   .modern-submit-btn { height: 48px; border-radius: 12px; font-weight: bold; font-size: 16px; background: linear-gradient(90deg, #0E7A55 0%, #16a34a 100%); border: none; box-shadow: 0 8px 20px rgba(14, 122, 85, 0.3); transition: transform 0.2s, box-shadow 0.2s; }
+   .modern-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(14, 122, 85, 0.4); background: linear-gradient(90deg, #0a5e41 0%, #128c3e 100%); }
+   
+   /* ---------- Scrollbars ---------- */
+   ::-webkit-scrollbar { width: 9px; height: 9px; }
+   ::-webkit-scrollbar-thumb { background: #cbd7d3; border-radius: 6px; }
+   ::-webkit-scrollbar-thumb:hover { background: #a9bcb6; }
+   ::-webkit-scrollbar-track { background: transparent; }
+   
+   /* =====================================================
+      GLASSMORPHISM SIDEBAR (D'après votre demande)
+      ===================================================== */
+   .glass-sidebar {
+     position: fixed; top: 20px; left: 20px; bottom: 20px; border-radius: 24px;
+     display: flex; flex-direction: column; z-index: 1000; transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+     background: linear-gradient(135deg, rgba(4, 30, 51, 0.7), rgba(14, 122, 85, 0.7));
+     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+     border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+     overflow: hidden;
+   }
+   .glass-sidebar.expanded { width: 260px; }
+   .glass-sidebar.collapsed { width: 80px; }
+   .mac-dots { display: flex; gap: 8px; padding: 16px 20px; opacity: 0.8; }
+   .dot { width: 12px; height: 12px; border-radius: 50%; }
+   .dot.red { background-color: #ff5f56; }
+   .dot.yellow { background-color: #ffbd2e; }
+   .dot.green { background-color: #27c93f; }
+   .sidebar-header { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+   .logo-container { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+   .logo-text { color: #fff; font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+   .user-profile { display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); }
+   .user-info { display: flex; flex-direction: column; overflow: hidden; }
+   .sidebar-menu { flex: 1; padding: 20px 12px; overflow-y: auto; overflow-x: hidden; }
+   .menu-label { color: rgba(255, 255, 255, 0.4); font-size: 11px; font-weight: 600; letter-spacing: 1.5px; margin-bottom: 12px; padding-left: 12px; }
+   .menu-item { display: flex; align-items: center; padding: 12px; margin-bottom: 4px; border-radius: 12px; cursor: pointer; color: rgba(255, 255, 255, 0.6); transition: all 0.2s ease; white-space: nowrap; }
+   .menu-item:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+   .menu-item.active { background: rgba(255, 255, 255, 0.15); color: #fff; font-weight: 600; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1); }
+   .menu-icon { font-size: 18px; display: flex; justify-content: center; align-items: center; min-width: 24px; }
+   .menu-text { margin-left: 16px; font-size: 14px; }
+   .sidebar-footer { padding: 20px 12px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; gap: 10px; }
+   .toggle-btn { display: flex; justify-content: center; align-items: center; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; cursor: pointer; color: rgba(255, 255, 255, 0.6); transition: 0.2s; }
+   .toggle-btn:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }

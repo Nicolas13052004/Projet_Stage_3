@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   Alert,
   Button,
-  Card,
   Col,
   Descriptions,
   Input,
@@ -30,6 +29,7 @@ import * as service from '../services/declarationService';
 import * as exportService from '../services/exportService';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { LoadingBlock } from '../components/Spinner';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { formatAr, STATUT_DECLARATION } from '../utils/format';
 
@@ -52,8 +52,10 @@ const afficherCategorie = (c) => {
 };
 
 export default function DeclarationForm({ idDeclaration, onRetour }) {
+  const { agent } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
+  const estResponsable = agent?.role === 'RESPONSABLE';
   const [confirm, setConfirm] = useState(null);
   const [declaration, setDeclaration] = useState(null);
   const [charges, setCharges] = useState([]);
@@ -320,22 +322,24 @@ export default function DeclarationForm({ idDeclaration, onRetour }) {
   ];
 
   return (
-    <>
-      <div className="page-header">
+    <div className="page-container">
+      {/* EN-TÊTE */}
+      <div className="page-header-card glass-card">
         <div>
           <Button
             type="text"
             icon={<ArrowLeftOutlined />}
             onClick={onRetour}
-            style={{ marginBottom: 4, paddingInline: 0 }}
+            style={{ marginBottom: 4, paddingInline: 0, fontWeight: 600 }}
           >
             Retour a la liste
           </Button>
-          <Title level={4} style={{ margin: 0 }}>
-            {declaration.contribuable?.raisonSociale} — Exercice {declaration.annee}
+          <Title level={4} style={{ margin: 0, color: '#0a2c22' }}>
+            {declaration.nomContribuable || declaration.contribuable?.raisonSociale} — Exercice{' '}
+            {declaration.annee}
           </Title>
           <Text type="secondary">
-            NIF : {declaration.contribuable?.nif} —{' '}
+            NIF : {declaration.nifContribuable || declaration.contribuable?.nif} —{' '}
             <Tag color={statutDef.couleur} style={{ marginInlineStart: 4 }}>
               {statutDef.libelle}
             </Tag>
@@ -351,29 +355,36 @@ export default function DeclarationForm({ idDeclaration, onRetour }) {
         </Space>
       </div>
 
+      {declaration.statut === 'BROUILLON' && (
+        <Alert
+          type="info"
+          showIcon
+          className="glass-card"
+          message="Declaration en brouillon — enregistrez vos donnees puis faites-la valider par le responsable."
+        />
+      )}
+
       {verrouille && (
         <Alert
           type="warning"
           showIcon
-          style={{ marginBottom: 16 }}
+          className="glass-card"
           message={`Cette declaration est ${declaration.statut} — elle n est plus modifiable.`}
         />
       )}
 
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={15}>
-          <Card
-            size="small"
-            title="Chiffre d affaires"
-            style={{ marginBottom: 16 }}
-            extra={
-              !verrouille && (
+          {/* CHIFFRE D'AFFAIRES */}
+          <div className="glass-card" style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#0a2c22' }}>Chiffre d'affaires</h3>
+              {!verrouille && (
                 <Button size="small" icon={<SaveOutlined />} onClick={handleSauverCa}>
                   Enregistrer
                 </Button>
-              )
-            }
-          >
+              )}
+            </div>
             <Space.Compact style={{ width: '100%' }}>
               <InputNumber
                 value={caHt}
@@ -386,14 +397,17 @@ export default function DeclarationForm({ idDeclaration, onRetour }) {
                 placeholder="CA HT"
               />
             </Space.Compact>
-          </Card>
+          </div>
 
-          <Card
-            size="small"
-            title={`Charges (${charges.length})`}
-            style={{ marginBottom: 16 }}
-            extra={<Statistic value={totalChargesAffiche} suffix="Ar" valueStyle={{ fontSize: 14 }} />}
-          >
+          {/* CHARGES */}
+          <div className="glass-card" style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#0a2c22' }}>
+                Charges ({charges.length})
+              </h3>
+              <Statistic value={totalChargesAffiche} suffix="Ar" valueStyle={{ fontSize: 14, color: '#0E7A55' }} />
+            </div>
+            
             <Table
               rowKey="idLigne"
               columns={colonnesCharges}
@@ -402,8 +416,9 @@ export default function DeclarationForm({ idDeclaration, onRetour }) {
               size="small"
               locale={{ emptyText: 'Aucune charge' }}
             />
+            
             {!verrouille && (
-              <Row gutter={[8, 8]} style={{ marginTop: 12 }}>
+              <Row gutter={[8, 8]} style={{ marginTop: 16 }}>
                 <Col xs={24} sm={6}>
                   <Select
                     value={nouvelleCharge.categorie}
@@ -465,9 +480,13 @@ export default function DeclarationForm({ idDeclaration, onRetour }) {
                 </Col>
               </Row>
             )}
-          </Card>
+          </div>
 
-          <Card size="small" title="Mois actifs (arret d activite)">
+          {/* MOIS ACTIFS */}
+          <div className="glass-card">
+            <h3 style={{ margin: '0 0 16px 0', fontSize: 16, fontWeight: 600, color: '#0a2c22' }}>
+              Mois actifs (arret d activite)
+            </h3>
             <Space.Compact style={{ width: '100%', maxWidth: 420 }}>
               <InputNumber
                 value={moisActifs}
@@ -486,16 +505,17 @@ export default function DeclarationForm({ idDeclaration, onRetour }) {
             <Text type="secondary" style={{ display: 'block', marginTop: 8 }}>
               Le minimum de perception est proratise : part fixe x mois actifs / 12.
             </Text>
-          </Card>
+          </div>
         </Col>
 
+        {/* RESULTAT DU CALCUL */}
         <Col xs={24} lg={9}>
           <div style={{ position: 'sticky', top: 16 }}>
-            <Card
-              size="small"
-              title="Resultat du calcul — 12 etapes"
-              style={{ marginBottom: 16 }}
-            >
+            <div className="glass-card">
+              <h3 style={{ margin: '0 0 16px 0', fontSize: 16, fontWeight: 600, color: '#0a2c22' }}>
+                Resultat du calcul — 12 etapes
+              </h3>
+              
               <Steps
                 direction="vertical"
                 size="small"
@@ -535,7 +555,7 @@ export default function DeclarationForm({ idDeclaration, onRetour }) {
               <Descriptions
                 column={1}
                 size="small"
-                style={{ marginTop: 12 }}
+                style={{ marginTop: 16 }}
                 items={[
                   {
                     key: 'pen',
@@ -556,7 +576,7 @@ export default function DeclarationForm({ idDeclaration, onRetour }) {
               />
 
               {!verrouille && (
-                <Space direction="vertical" style={{ width: '100%', marginTop: 16 }}>
+                <Space direction="vertical" style={{ width: '100%', marginTop: 20 }}>
                   <Button
                     type="primary"
                     block
@@ -574,21 +594,27 @@ export default function DeclarationForm({ idDeclaration, onRetour }) {
                     >
                       Enregistrer en brouillon
                     </Button>
-                    <Button
-                      icon={<CheckCircleOutlined />}
-                      style={{
-                        background: '#0e7a55',
-                        borderColor: '#0e7a55',
-                        color: '#fff',
-                      }}
-                      onClick={handleValider}
-                    >
-                      Valider la declaration
-                    </Button>
+                    {estResponsable ? (
+                      <Button
+                        icon={<CheckCircleOutlined />}
+                        style={{
+                          background: '#0e7a55',
+                          borderColor: '#0e7a55',
+                          color: '#fff',
+                        }}
+                        onClick={handleValider}
+                      >
+                        Valider la declaration
+                      </Button>
+                    ) : (
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        La validation est reservee au responsable.
+                      </Text>
+                    )}
                   </Space>
                 </Space>
               )}
-            </Card>
+            </div>
           </div>
         </Col>
       </Row>
@@ -605,6 +631,6 @@ export default function DeclarationForm({ idDeclaration, onRetour }) {
         }}
         onAnnuler={() => setConfirm(null)}
       />
-    </>
+    </div>
   );
 }

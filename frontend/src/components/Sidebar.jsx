@@ -1,26 +1,17 @@
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, Avatar, Typography, Button, Tooltip } from 'antd';
+import { Avatar, Typography, Tooltip } from 'antd';
 import {
-  DashboardOutlined,
-  TeamOutlined,
-  FileTextOutlined,
-  FallOutlined,
-  CalendarOutlined,
-  CreditCardOutlined,
-  WarningOutlined,
-  PauseCircleOutlined,
-  AuditOutlined,
-  SettingOutlined,
-  LogoutOutlined,
-  UserOutlined,
-  AlertOutlined,
+  DashboardOutlined, TeamOutlined, FileTextOutlined, FallOutlined, CalendarOutlined,
+  CreditCardOutlined, WarningOutlined, PauseCircleOutlined, AuditOutlined, SettingOutlined,
+  LogoutOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../context/AuthContext';
 import Logo from './Logo';
 
 const { Text } = Typography;
 
-const MENU = [
+const MENU_ITEMS = [
   { path: '/dashboard', label: 'Tableau de bord', icon: <DashboardOutlined /> },
   { path: '/contribuables', label: 'Contribuables', icon: <TeamOutlined /> },
   { path: '/declarations', label: 'Declarations IR', icon: <FileTextOutlined /> },
@@ -29,23 +20,22 @@ const MENU = [
   { path: '/paiements', label: 'Paiements', icon: <CreditCardOutlined /> },
   { path: '/penalites', label: 'Penalites', icon: <WarningOutlined /> },
   { path: '/suspensions', label: 'Arret / reprise', icon: <PauseCircleOutlined /> },
-  { path: '/audit', label: "Journal d'audit", icon: <AuditOutlined /> },
-  { path: '/admin', label: 'Administration', icon: <SettingOutlined />, role: 'ADMIN' },
+  
+  // Restriction par tableau de rôles
+  { path: '/audit', label: "Journal d'audit", icon: <AuditOutlined />, roles: ['RESPONSABLE', 'ADMIN'] },
+  { path: '/admin', label: 'Administration', icon: <SettingOutlined />, roles: ['ADMIN'] },
 ];
 
-export default function Sidebar({ collapsed = false }) {
+export default function Sidebar({ collapsed, toggleCollapsed }) {
   const { agent, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const items = MENU.filter((m) => !m.role || m.role === agent?.role).map((m) => ({
-    key: m.path,
-    icon: m.icon,
-    label: m.label,
-  }));
-
-  const selected = items.find((i) => location.pathname.startsWith(i.key))?.key
-    || '/dashboard';
+  // On filtre selon le tableau de rôles
+  const filteredMenu = MENU_ITEMS.filter((m) => {
+    if (!m.roles) return true; // Accessible à tous
+    return m.roles.includes(agent?.role); // Vérifie si le rôle est dans la liste
+  });
 
   const handleLogout = () => {
     logout();
@@ -53,55 +43,56 @@ export default function Sidebar({ collapsed = false }) {
   };
 
   return (
-    <div className="side-menu">
-      <div className="side-brand">
-        <Logo size={34} repli="IR" />
+    <div className={`glass-sidebar ${collapsed ? 'collapsed' : 'expanded'}`}>
+      <div className="mac-dots">
+        <span className="dot red"></span>
+        <span className="dot yellow"></span>
+        <span className="dot green"></span>
+      </div>
+
+      <div className="sidebar-header">
+        <div className="logo-container" onClick={() => navigate('/dashboard')}>
+          <Logo size={collapsed ? 32 : 40} repli="IR" />
+          {!collapsed && <span className="logo-text">Gestion IR</span>}
+        </div>
         {!collapsed && (
-          <div className="side-brand-text">
-            <strong>Gestion IR</strong>
-            <span>Centre fiscal</span>
+          <div className="user-profile">
+            <Avatar size={40} style={{ backgroundColor: 'rgba(255,255,255,0.2)' }} icon={<UserOutlined />} />
+            <div className="user-info">
+              <Text strong style={{ color: '#fff', display: 'block', lineHeight: 1 }}>
+                {agent?.prenom} {agent?.nom}
+              </Text>
+              <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12 }}>
+                {agent?.role}
+              </Text>
+            </div>
           </div>
         )}
       </div>
 
-      <Menu
-        theme="dark"
-        mode="inline"
-        inlineCollapsed={collapsed}
-        selectedKeys={[selected]}
-        items={items}
-        onClick={({ key }) => navigate(key)}
-        style={{ borderInlineEnd: 'none', flex: 1, overflowY: 'auto' }}
-      />
+      <div className="sidebar-menu">
+        {!collapsed && <div className="menu-label">MENU</div>}
+        {filteredMenu.map((item) => {
+          const isActive = location.pathname.startsWith(item.path);
+          return (
+            <Tooltip key={item.path} title={collapsed ? item.label : ''} placement="right" color="#0a5e41">
+              <div className={`menu-item ${isActive ? 'active' : ''}`} onClick={() => navigate(item.path)}>
+                <span className="menu-icon">{item.icon}</span>
+                {!collapsed && <span className="menu-text">{item.label}</span>}
+              </div>
+            </Tooltip>
+          );
+        })}
+      </div>
 
-      <div className="side-footer">
-        <Avatar
-          size={32}
-          style={{ backgroundColor: '#0E7A55', flexShrink: 0 }}
-          icon={!agent?.prenom && !agent?.nom ? <UserOutlined /> : undefined}
-        >
-          {agent?.prenom || agent?.nom
-            ? `${(agent?.prenom || '')[0] || ''}${(agent?.nom || '')[0] || ''}`.toUpperCase()
-            : ''}
-        </Avatar>
-        {!collapsed && (
-          <div className="side-agent">
-            <Text strong style={{ color: '#fff', lineHeight: 1.2 }}>
-              {agent ? `${agent.prenom || ''} ${agent.nom || ''}`.trim() : ''}
-            </Text>
-            <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12 }}>
-              {agent?.role || ''}
-            </Text>
-          </div>
-        )}
-        <Tooltip title="Deconnexion" placement="right">
-          <Button
-            type="text"
-            icon={<LogoutOutlined />}
-            onClick={handleLogout}
-            style={{ color: 'rgba(255,255,255,0.75)', marginLeft: 'auto' }}
-          />
-        </Tooltip>
+      <div className="sidebar-footer">
+        <div className="menu-item" onClick={handleLogout}>
+          <span className="menu-icon"><LogoutOutlined /></span>
+          {!collapsed && <span className="menu-text">Déconnexion</span>}
+        </div>
+        <div className="toggle-btn" onClick={toggleCollapsed}>
+          <span className="menu-icon">{collapsed ? '→' : '←'}</span>
+        </div>
       </div>
     </div>
   );

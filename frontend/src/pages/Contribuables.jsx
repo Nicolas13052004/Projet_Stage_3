@@ -109,7 +109,6 @@ export default function Contribuables() {
     }
   };
 
-
   const handleSubmit = async (payload) => {
     try {
       setError('');
@@ -212,78 +211,90 @@ export default function Contribuables() {
   ];
 
   return (
-    <div className="page">
-      <div className="page-header">
+    <div className="page-container">
+      {/* EN-TÊTE */}
+      <div className="page-header-card glass-card">
         <div>
           <h1 className="page-title">Contribuables</h1>
           <p className="page-subtitle">Gestion des contribuables soumis a l IR</p>
         </div>
-          <Button
-            icon={<FileExcelOutlined />}
-            onClick={handleExportExcel}
-            loading={exportLoading}
-          >
-            Exporter Excel
-          </Button>
+        <Button
+          icon={<FileExcelOutlined />}
+          onClick={handleExportExcel}
+          loading={exportLoading}
+        >
+          Exporter Excel
+        </Button>
       </div>
 
-      {error && <Alert type="error" showIcon message={error} style={{ marginBottom: 16 }} />}
+      {error && <Alert type="error" showIcon message={error} className="glass-card" />}
 
       {mode === 'liste' && (
         <>
-          <SearchBar
-            value={motCle}
-            onChange={(v) => {
-              setMotCle(v);
-              chargerAvec(v, statut);
-            }}
-            placeholder="Recherche (NIF, nom, STAT, telephone)"
-          >
-            <Select
-              style={{ minWidth: 170 }}
-              value={statut || undefined}
-              placeholder="Tous statuts"
-              allowClear
+          {/* BARRE D'OUTILS */}
+          <div className="toolbar-card glass-card">
+            <SearchBar
+              value={motCle}
               onChange={(v) => {
-                const st = v || '';
-                setStatut(st);
-                chargerAvec(motCle, st);
+                setMotCle(v);
+                chargerAvec(v, statut);
               }}
-              options={OPTIONS_STATUT}
-            />
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleNouveau}>
-              Nouveau contribuable
-            </Button>
-          </SearchBar>
+              placeholder="Recherche (NIF, nom, STAT, telephone)"
+            >
+              <Select
+                style={{ minWidth: 170 }}
+                value={statut || undefined}
+                placeholder="Tous statuts"
+                allowClear
+                onChange={(v) => {
+                  const st = v || '';
+                  setStatut(st);
+                  chargerAvec(motCle, st);
+                }}
+                options={OPTIONS_STATUT}
+              />
+              <Button type="primary" icon={<PlusOutlined />} onClick={handleNouveau}>
+                Nouveau contribuable
+              </Button>
+            </SearchBar>
+          </div>
 
+          {/* TABLEAU */}
           {loading ? (
-            <SkeletonTable rows={5} cols={7} />
+            <div className="glass-card">
+              <SkeletonTable rows={5} cols={7} />
+            </div>
           ) : (
-            <Table
-              rowKey="idContribuable"
-              columns={colonnes}
-              dataSource={liste}
-              scroll={{ x: 900 }}
-              pagination={{
-                pageSize: 10,
-                showSizeChanger: false,
-                showTotal: (total) => total + ' resultat(s)',
-              }}
-              locale={{ emptyText: 'Aucun contribuable' }}
-            />
+            <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+              <Table
+                rowKey="idContribuable"
+                columns={colonnes}
+                dataSource={liste}
+                scroll={{ x: 900 }}
+                pagination={{
+                  pageSize: 10,
+                  showSizeChanger: false,
+                  showTotal: (total) => total + ' resultat(s)',
+                  style: { padding: '0 16px' }
+                }}
+                locale={{ emptyText: 'Aucun contribuable' }}
+              />
+            </div>
           )}
         </>
       )}
 
       {mode === 'form' && (
-        <ContribuableForm
-          initial={enEdition}
-          onSubmit={handleSubmit}
-          onCancel={() => {
-            setMode('liste');
-            setEnEdition(null);
-          }}
-        />
+        <div className="glass-card">
+          <ContribuableForm
+            initial={enEdition}
+            onSubmit={handleSubmit}
+            onCancel={() => {
+              setMode('liste');
+              setEnEdition(null);
+            }}
+          />
+        </div>
       )}
 
       <StatutModal

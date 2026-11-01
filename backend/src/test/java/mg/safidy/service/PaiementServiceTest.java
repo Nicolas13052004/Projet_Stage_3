@@ -70,6 +70,7 @@ class PaiementServiceTest {
         declaration.setAnnee(LocalDate.now().getYear());
         declaration.setIrDu(12_000_000L);
         declaration.setAcomptesVerses(10_000_000L);
+        declaration.setStatut("VALIDEE");
         declaration.setContribuable(contribuable);
     }
 
@@ -169,6 +170,17 @@ class PaiementServiceTest {
         when(contribuableRepository.findById(1L)).thenReturn(Optional.of(contribuable));
         when(declarationRepository.findById(1L)).thenReturn(Optional.of(declaration));
         when(paiementRepository.findByDeclarationIdDeclaration(1L)).thenReturn(List.of(dejaPaye));
+
+        assertThrows(BusinessException.class, () -> service.enregistrer(
+                1L, 1L, null, "TOUS", null, LocalDate.now(), "VIREMENT", 9L));
+    }
+
+    @Test
+    void reglementTous_interditSiDeclarationEnBrouillon() {
+        declaration.setStatut("BROUILLON");
+
+        when(contribuableRepository.findById(1L)).thenReturn(Optional.of(contribuable));
+        when(declarationRepository.findById(1L)).thenReturn(Optional.of(declaration));
 
         assertThrows(BusinessException.class, () -> service.enregistrer(
                 1L, 1L, null, "TOUS", null, LocalDate.now(), "VIREMENT", 9L));

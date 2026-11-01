@@ -11,6 +11,7 @@ import mg.safidy.service.DeclarationIRService;
 import mg.safidy.service.StatutAutomatiqueService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize; // IMPORTANT
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -56,7 +57,6 @@ public class DeclarationIRController {
             @RequestParam(required = false) Long soldeAPayerMin,
             @RequestParam(required = false) Long soldeAPayerMax,
             @RequestParam(required = false) Integer moisActifs) {
-        // Passage automatique en EN_RETARD des declarations echues (sans scheduler)
         statutAutomatiqueService.appliquerRetards();
         
         DeclarationIRSearchCriteria criteria = new DeclarationIRSearchCriteria();
@@ -155,9 +155,6 @@ public class DeclarationIRController {
     @PostMapping("/{id}/calculer")
     public ResponseEntity<DeclarationIR> calculer(@PathVariable Long id,
                                                    @RequestBody(required = false) Map<String, Object> body) {
-        // Les ajustements manuels ne sont plus saisis dans l'UI :
-        // absence de cle = calcul automatique (reintegrations conservees,
-        // acomptes verses calcules depuis les acomptes provisionnels payes).
         Long reintegrations = body == null || body.get("totalReintegrations") == null ? null
                 : Long.valueOf(body.get("totalReintegrations").toString());
         Long deductions = body == null || body.get("totalDeductions") == null ? null
@@ -169,7 +166,9 @@ public class DeclarationIRController {
         return ResponseEntity.ok(saved);
     }
 
+    // SEUL LE RESPONSABLE PEUT VALIDER
     @PostMapping("/{id}/valider")
+    @PreAuthorize("hasRole('RESPONSABLE')")
     public ResponseEntity<DeclarationIR> valider(@PathVariable Long id) {
         DeclarationIR saved = service.valider(id);
         audit.log("VALIDATION_DECLARATION", "declaration_ir", id,
@@ -184,7 +183,9 @@ public class DeclarationIRController {
         return ResponseEntity.ok(saved);
     }
 
+    // SEUL LE RESPONSABLE PEUT RE-OUVRIR UNE DÉCLARATION VALIDÉE
     @PatchMapping("/{id}/statut")
+    @PreAuthorize("hasRole('RESPONSABLE')")
     public DeclarationIR changerStatut(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String statut = body.get("statut");
         if (statut == null || !(statut.equals("BROUILLON") || statut.equals("VALIDEE")

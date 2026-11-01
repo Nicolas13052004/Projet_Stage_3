@@ -5,6 +5,7 @@ import mg.safidy.model.Agent;
 import mg.safidy.model.CentreFiscal;
 import mg.safidy.repository.AgentRepository;
 import mg.safidy.repository.CentreFiscalRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,15 +18,22 @@ import java.util.List;
 public class AgentService {
 
     private static final int MAX_TENTATIVES = 5;
+    private static final int TENTATIVES_AVERTISSEMENT = 3;
 
     private final AgentRepository agentRepository;
     private final CentreFiscalRepository centreRepository;
+    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    @Value("${app.admin.email:admin@safidy.mg}")
+    private String emailAdmin;
+
     public AgentService(AgentRepository agentRepository,
-                         CentreFiscalRepository centreRepository) {
+                        CentreFiscalRepository centreRepository,
+                        EmailService emailService) {
         this.agentRepository = agentRepository;
         this.centreRepository = centreRepository;
+        this.emailService = emailService;
     }
 
     public List<Agent> lister() {
@@ -92,6 +100,27 @@ public class AgentService {
         return agentRepository.save(a);
     }
 
+    /**
+     * Réinitialise le mot de passe, débloque le compte et envoie un e-mail.
+     */
+    @Transactional
+    public Agent debloquerEtReinitialiser(Long id, String nouveauMotDePasse) {
+        if (nouveauMotDePasse == null || nouveauMotDePasse.length() < 8) {
+            throw new BusinessException("Mot de passe : 8 caracteres minimum");
+        }
+        Agent a = trouverParId(id);
+        
+        a.setMotDePasseHash(passwordEncoder.encode(nouveauMotDePasse));
+        a.setTentativesEchec(0);
+        a.setStatut("ACTIF");
+        agentRepository.save(a);
+
+        System.out.println(">>> ENVOI EMAIL DEBLOCAGE A : " + a.getEmail());
+        emailService.envoyerEmailDeblocage(a.getEmail());
+
+        return a;
+    }
+
     @Transactional
     public void enregistrerConnexionReussie(Agent a) {
         a.setTentativesEchec(0);
@@ -99,13 +128,30 @@ public class AgentService {
         agentRepository.save(a);
     }
 
+    /**
+     * Gère l'échec de connexion, l'incrémentation, le blocage et l'envoi d'e-mails.
+     */
     @Transactional
     public void enregistrerEchecConnexion(Agent a) {
         int n = (a.getTentativesEchec() == null ? 0 : a.getTentativesEchec()) + 1;
         a.setTentativesEchec(n);
-        if (n >= MAX_TENTATIVES) {
+
+        System.out.println(">>> ECHEC CONNEXION N°" + n + " POUR : " + a.getEmail());
+
+        if (n == TENTATIVES_AVERTISSEMENT) {
+            // Après 3 échecs : alerte utilisateur
+            System.out.println(">>> DECLENCHEMENT EMAIL AVERTISSEMENT (3 échecs)");
+            emailService.envoyerEmailAvertissement(a.getEmail());
+        } else if (n >= MAX_TENTATIVES) {
+            // Après 5 échecs : blocage + e-mail utilisateur + e-mail admin
+            System.out.println(">>> DECLENCHEMENT EMAIL BLOCAGE (5 échecs)");
             a.setStatut("BLOQUE");
+            emailService.envoyerEmailBlocage(a.getEmail());
+            
+            System.out.println(">>> DECLENCHEMENT EMAIL ADMIN");
+            emailService.envoyerEmailAdminBlocage(emailAdmin, a.getNom() + " " + a.getPrenom(), a.getEmail());
         }
+
         agentRepository.save(a);
     }
 

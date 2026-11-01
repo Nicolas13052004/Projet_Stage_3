@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Button,
-  Card,
   Col,
   DatePicker,
   Form,
@@ -91,6 +90,7 @@ function lignesRecap(r) {
 export default function Paiements() {
   const { agent } = useAuth();
   const toast = useToast();
+  const estResponsable = agent?.role === 'RESPONSABLE';
 
   const [liste, setListe] = useState([]);
   const [contribuables, setContribuables] = useState([]);
@@ -150,17 +150,23 @@ export default function Paiements() {
   const declarationsDuContribuable = useMemo(
     () =>
       declarations.filter(
-        (d) => String(d.contribuable?.idContribuable) === String(idContribuable)
+        (d) =>
+          String(d.idContribuable ?? d.contribuable?.idContribuable) ===
+          String(idContribuable)
       ),
     [declarations, idContribuable]
   );
 
-  const optionsDeclarations = declarationsDuContribuable.map((d) => ({
-    value: String(d.idDeclaration),
-    label: `${d.annee} - IR ${formatAr(d.irDu)} - solde ${formatAr(d.soldeAPayer)} (${
-      d.statut || '-'
-    })`,
-  }));
+  const statutsPayables =
+    typeReglement === '2EME_ACOMPTE' ? ['PAYEE'] : ['VALIDEE', 'EN_RETARD'];
+  const optionsDeclarations = declarationsDuContribuable
+    .filter((d) => statutsPayables.includes(d.statut))
+    .map((d) => ({
+      value: String(d.idDeclaration),
+      label: `${d.annee} - IR ${formatAr(d.irDu)} - solde ${formatAr(d.soldeAPayer)} (${
+        d.statut || '-'
+      })`,
+    }));
 
   useEffect(() => {
     if (!wizard || etape !== 2 || !idDeclaration) return undefined;
@@ -357,7 +363,7 @@ export default function Paiements() {
           </Button>
           {p.annule ? (
             <Tag color="default">Annule</Tag>
-          ) : (
+          ) : estResponsable ? (
             <Tooltip title="Annuler le paiement">
               <Button
                 size="small"
@@ -367,23 +373,24 @@ export default function Paiements() {
                 onClick={() => demanderAnnulation(p)}
               />
             </Tooltip>
-          )}
+          ) : null}
         </Space>
       ),
     },
   ];
 
   return (
-    <div className="page">
-      <header className="page-header">
+    <div className="page-container">
+      {/* EN-TÊTE */}
+      <div className="page-header-card glass-card">
         <div>
           <h1 className="page-title">Paiements</h1>
           <p className="page-subtitle">Enregistrement des paiements et quittances</p>
         </div>
-      </header>
+      </div>
 
       {erreur && (
-        <Alert type="error" showIcon message={erreur} closable onClose={() => setErreur('')} />
+        <Alert type="error" showIcon message={erreur} closable onClose={() => setErreur('')} className="glass-card" />
       )}
 
       {dernierPaiement && (
@@ -393,6 +400,7 @@ export default function Paiements() {
           message="Paiement enregistre avec succes"
           closable
           onClose={() => setDernierPaiement(null)}
+          className="glass-card"
           action={
             <Button
               size="small"
@@ -406,8 +414,8 @@ export default function Paiements() {
         />
       )}
 
-
-      <div className="toolbar">
+      {/* BARRE D'OUTILS */}
+      <div className="toolbar-card glass-card">
         <div style={{ flex: '1 1 300px', maxWidth: 460 }}>
           <ContribuableRecherche
             contribuables={contribuables}
@@ -428,24 +436,27 @@ export default function Paiements() {
         </Space>
       </div>
 
-      <SearchBar
-        value={recherche}
-        onChange={setRecherche}
-        placeholder="Recherche (quittance, contribuable, NIF)"
-      />
+      <div className="toolbar-card glass-card">
+        <SearchBar
+          value={recherche}
+          onChange={setRecherche}
+          placeholder="Recherche (quittance, contribuable, NIF)"
+        />
+      </div>
 
+      {/* STATISTIQUES */}
       <Row gutter={[16, 16]}>
         <Col xs={12} md={6}>
-          <Card>
+          <div className="glass-card">
             <Statistic
               title="Total paiements"
               value={liste.length}
               prefix={<CreditCardOutlined style={{ color: '#0E7A55' }} />}
             />
-          </Card>
+          </div>
         </Col>
         <Col xs={12} md={6}>
-          <Card>
+          <div className="glass-card">
             <Statistic
               title="Montant total"
               value={totalMontant}
@@ -453,59 +464,71 @@ export default function Paiements() {
               prefix={<WalletOutlined style={{ color: '#16A34A' }} />}
               valueStyle={{ color: '#16A34A' }}
             />
-          </Card>
+          </div>
         </Col>
         <Col xs={12} md={6}>
-          <Card>
+          <div className="glass-card">
             <Statistic
               title="Valides"
               value={paiementsValides}
               prefix={<UserOutlined style={{ color: '#0369A1' }} />}
             />
-          </Card>
+          </div>
         </Col>
         <Col xs={12} md={6}>
-          <Card>
+          <div className="glass-card">
             <Statistic
               title="Annules"
               value={paiementsAnnules}
               prefix={<CloseCircleOutlined style={{ color: '#DC2626' }} />}
             />
-          </Card>
+          </div>
         </Col>
       </Row>
 
+      {/* TABLEAU */}
       {loading ? (
-        <SkeletonTable rows={5} cols={8} />
+        <div className="glass-card">
+          <SkeletonTable rows={5} cols={8} />
+        </div>
       ) : listeFiltree.length === 0 ? (
-        <EmptyState
-          icone={<CreditCardOutlined style={{ fontSize: 32, color: '#0E7A55' }} />}
-          titre="Aucun paiement"
-          texte="Ajoutez un paiement pour commencer"
-          action={
-            recherche || idContribuable ? (
-              <Button
-                onClick={() => {
-                  setRecherche('');
-                  setIdContribuable('');
-                }}
-              >
-                Reinitialiser la recherche
-              </Button>
-            ) : null
-          }
-        />
+        <div className="glass-card" style={{ padding: 40 }}>
+          <EmptyState
+            icone={<CreditCardOutlined style={{ fontSize: 32, color: '#0E7A55' }} />}
+            titre="Aucun paiement"
+            texte="Ajoutez un paiement pour commencer"
+            action={
+              recherche || idContribuable ? (
+                <Button
+                  onClick={() => {
+                    setRecherche('');
+                    setIdContribuable('');
+                  }}
+                >
+                  Reinitialiser la recherche
+                </Button>
+              ) : null
+            }
+          />
+        </div>
       ) : (
-        <Table
-          rowKey="idPaiement"
-          size="medium"
-          columns={colonnes}
-          dataSource={listeFiltree}
-          pagination={{ pageSize: 10, showSizeChanger: true }}
-          locale={{ emptyText: 'Aucun paiement' }}
-        />
+        <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+          <Table
+            rowKey="idPaiement"
+            size="medium"
+            columns={colonnes}
+            dataSource={listeFiltree}
+            pagination={{ 
+              pageSize: 10, 
+              showSizeChanger: true,
+              style: { padding: '0 16px' }
+            }}
+            locale={{ emptyText: 'Aucun paiement' }}
+          />
+        </div>
       )}
 
+      {/* MODAL WIZARD DE PAIEMENT */}
       <Modal
         open={wizard}
         title="Enregistrer un paiement"
@@ -533,7 +556,10 @@ export default function Paiements() {
               <Segmented
                 block
                 value={typeReglement}
-                onChange={setTypeReglement}
+                onChange={(v) => {
+                  setTypeReglement(v);
+                  setIdDeclaration('');
+                }}
                 options={[
                   { label: 'Solde total (TOUS)', value: 'TOUS' },
                   { label: '2e acompte', value: '2EME_ACOMPTE' },
@@ -555,7 +581,11 @@ export default function Paiements() {
                 options={optionsDeclarations}
                 onChange={(v) => setIdDeclaration(v)}
                 disabled={!idContribuable}
-                notFoundContent="Aucune declaration pour ce contribuable"
+                notFoundContent={
+                  typeReglement === '2EME_ACOMPTE'
+                    ? 'Aucune declaration payee pour ce contribuable'
+                    : 'Aucune declaration validee (un brouillon doit etre valide par le responsable)'
+                }
               />
             </Form.Item>
           </Form>
@@ -596,15 +626,14 @@ export default function Paiements() {
             ) : !recap ? (
               <LoadingBlock message="Chargement du recapitulatif..." />
             ) : (
-              <Card
-                size="small"
-                title={`Recapitulatif - ${libelleReglement(recap.typeReglement)}`}
-                extra={
+              <div className="glass-card" style={{ padding: 20, boxShadow: 'none', background: '#f8fafc' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <h4 style={{ margin: 0, color: '#0a2c22' }}>Recapitulatif - {libelleReglement(recap.typeReglement)}</h4>
                   <Tag color={couleurReglement(recap.typeReglement)}>
                     Annee {recap.annee}
                   </Tag>
-                }
-              >
+                </div>
+                
                 {lignesRecap(recap).map((ligne) => (
                   <div
                     key={ligne.label}
@@ -635,7 +664,7 @@ export default function Paiements() {
                     </span>
                   </div>
                 ))}
-              </Card>
+              </div>
             )}
           </div>
         )}
@@ -675,6 +704,7 @@ export default function Paiements() {
         </div>
       </Modal>
 
+      {/* MODAL ANNULATION */}
       <Modal
         open={!!annulation}
         title="Motif d'annulation du paiement"

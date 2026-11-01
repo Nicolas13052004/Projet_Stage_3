@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Card, Col, Row, Select, Space, Statistic, Table, Tag, Typography } from 'antd';
+import { Button, Col, Row, Select, Space, Statistic, Table, Tag, Typography } from 'antd';
 import { AlertOutlined, FileExcelOutlined, ReloadOutlined } from '@ant-design/icons';
 import SearchBar from '../components/SearchBar';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -113,7 +113,7 @@ export default function Recouvrement() {
         <div>
           <Text strong>{r.raisonSociale}</Text>
           <br />
-          <Text type="secondary">NIF : {r.nif}</Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>NIF : {r.nif}</Text>
         </div>
       ),
     },
@@ -177,8 +177,9 @@ export default function Recouvrement() {
   ];
 
   return (
-    <div className="page">
-      <div className="page-header">
+    <div className="page-container">
+      {/* EN-TÊTE */}
+      <div className="page-header-card glass-card">
         <div>
           <h1 className="page-title">Recouvrement</h1>
           <p className="page-subtitle">Contribuables debiteurs de l IR - annee en cours</p>
@@ -204,58 +205,68 @@ export default function Recouvrement() {
         </Space>
       </div>
 
+      {/* STATISTIQUES */}
       <Row gutter={[16, 16]}>
         <Col xs={12} md={6}>
-          <Card>
-            <Statistic title="Debiteurs" value={kpis.debitaires} prefix={<AlertOutlined />} />
-          </Card>
+          <div className="glass-card">
+            <Statistic title="Debiteurs" value={kpis.debitaires} prefix={<AlertOutlined style={{ color: '#0E7A55' }} />} />
+          </div>
         </Col>
         <Col xs={12} md={6}>
-          <Card>
+          <div className="glass-card">
             <Statistic title="IR du total" value={kpis.irDu} formatter={() => formatAr(kpis.irDu)} />
-          </Card>
+          </div>
         </Col>
         <Col xs={12} md={6}>
-          <Card>
+          <div className="glass-card">
             <Statistic
               title="Deja paye"
               value={kpis.dejaPaye}
               formatter={() => formatAr(kpis.dejaPaye)}
+              valueStyle={{ color: '#16A34A' }}
             />
-          </Card>
+          </div>
         </Col>
         <Col xs={12} md={6}>
-          <Card>
+          <div className="glass-card">
             <Statistic
               title="Reste a recouvrer"
               value={kpis.reste}
               formatter={() => formatAr(kpis.reste)}
               valueStyle={{ color: '#DC2626' }}
             />
-          </Card>
+          </div>
         </Col>
       </Row>
 
-      <SearchBar
-        value={motCle}
-        onChange={setMotCle}
-        placeholder="Recherche (NIF, raison sociale)"
-      />
+      {/* RECHERCHE */}
+      <div className="toolbar-card glass-card">
+        <SearchBar
+          value={motCle}
+          onChange={setMotCle}
+          placeholder="Recherche (NIF, raison sociale)"
+        />
+      </div>
 
-      <Card size="small">
+      {/* TABLEAU */}
+      <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
         <Table
           rowKey="idDeclaration"
           columns={colonnes}
           dataSource={listeFiltree}
           loading={loading}
-          pagination={{ pageSize: 20, showSizeChanger: false }}
+          pagination={{ 
+            pageSize: 20, 
+            showSizeChanger: false,
+            style: { padding: '0 16px' }
+          }}
           locale={{
             emptyText: (
               <EmptyState titre="Aucun impaye" texte="Aucun impaye pour cette annee" />
             ),
           }}
         />
-      </Card>
+      </div>
 
       <ConfirmDialog
         ouvert={!!confirm}

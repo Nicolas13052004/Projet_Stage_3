@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
   Button,
-  Card,
   Col,
   InputNumber,
   Progress,
@@ -426,8 +425,9 @@ export default function Acomptes() {
   ];
 
   return (
-    <div className="page">
-      <div className="page-header">
+    <div className="page-container">
+      {/* EN-TÊTE */}
+      <div className="page-header-card glass-card">
         <div>
           <h1 className="page-title">Acomptes</h1>
           <p className="page-subtitle">
@@ -462,10 +462,12 @@ export default function Acomptes() {
       </div>
 
       {!selected ? (
-        <EmptyState
-          titre="Selectionnez un contribuable"
-          texte="Choisissez un contribuable pour consulter ses echeances et paiements."
-        />
+        <div className="glass-card" style={{ padding: 48, textAlign: 'center' }}>
+          <EmptyState
+            titre="Selectionnez un contribuable"
+            texte="Choisissez un contribuable pour consulter ses echeances et paiements."
+          />
+        </div>
       ) : loading ? (
         <div aria-live="polite">
           <SkeletonStatsGrid count={4} />
@@ -473,9 +475,10 @@ export default function Acomptes() {
         </div>
       ) : (
         <>
+          {/* STATISTIQUES */}
           <Row gutter={[16, 16]}>
             <Col xs={12} md={6}>
-              <Card>
+              <div className="glass-card">
                 <Statistic
                   title="Total a payer"
                   value={totalAttendu}
@@ -483,10 +486,10 @@ export default function Acomptes() {
                   suffix="Ar"
                   prefix={<FileTextOutlined style={{ color: '#0369A1' }} />}
                 />
-              </Card>
+              </div>
             </Col>
             <Col xs={12} md={6}>
-              <Card>
+              <div className="glass-card">
                 <Statistic
                   title="Total paye"
                   value={totalPaye}
@@ -502,10 +505,10 @@ export default function Acomptes() {
                   strokeColor="#0E7A55"
                   style={{ marginTop: 4 }}
                 />
-              </Card>
+              </div>
             </Col>
             <Col xs={12} md={6}>
-              <Card>
+              <div className="glass-card">
                 <Statistic
                   title="En retard"
                   value={totalRetard}
@@ -514,10 +517,10 @@ export default function Acomptes() {
                   prefix={<WarningOutlined style={{ color: '#DC2626' }} />}
                   valueStyle={{ color: '#DC2626' }}
                 />
-              </Card>
+              </div>
             </Col>
             <Col xs={12} md={6}>
-              <Card>
+              <div className="glass-card">
                 <Statistic
                   title="Reste a payer"
                   value={resteAPayer}
@@ -526,19 +529,19 @@ export default function Acomptes() {
                   prefix={<CreditCardOutlined style={{ color: '#EA580C' }} />}
                   valueStyle={{ color: '#EA580C' }}
                 />
-              </Card>
+              </div>
             </Col>
           </Row>
 
-          <Card
-            title={
-              <span>
+          {/* SITUATION PAR ANNEE */}
+          <div className="glass-card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#0a2c22' }}>
                 <CalendarOutlined style={{ color: '#0E7A55', marginRight: 8 }} />
                 Situation par annee
-              </span>
-            }
-            extra={<Text type="secondary">{lignes.length} exercice(s)</Text>}
-          >
+              </h3>
+              <Text type="secondary">{lignes.length} exercice(s)</Text>
+            </div>
             <Table
               rowKey="annee"
               size="small"
@@ -559,17 +562,18 @@ export default function Acomptes() {
                 ),
               }}
             />
-          </Card>
+          </div>
 
-          <Card
-            title={
-              <span>
+          {/* ACOMPTES PROVISIONNELS */}
+          <div className="glass-card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#0a2c22' }}>
                 <CalendarOutlined style={{ color: '#0369A1', marginRight: 8 }} />
                 Acomptes provisionnels - exercice {annee}
-              </span>
-            }
-            extra={<Tag color="blue">{cartesAffichees.length} acompte(s)</Tag>}
-          >
+              </h3>
+              <Tag color="blue">{cartesAffichees.length} acompte(s)</Tag>
+            </div>
+            
             {cartesAffichees.length === 0 ? (
               <EmptyState
                 titre="Aucun acompte provisionnel"
@@ -598,18 +602,18 @@ export default function Acomptes() {
                 ))}
               </div>
             )}
-          </Card>
+          </div>
 
+          {/* ACOMPTES CREATION */}
           {s.creation.length > 0 && (
-            <Card
-              title={
-                <span>
+            <div className="glass-card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#0a2c22' }}>
                   <FileTextOutlined style={{ color: '#7C3AED', marginRight: 8 }} />
                   Acomptes de creation
-                </span>
-              }
-              extra={<Text type="secondary">{s.creation.length} acompte(s)</Text>}
-            >
+                </h3>
+                <Text type="secondary">{s.creation.length} acompte(s)</Text>
+              </div>
               <Table
                 rowKey="idAcompte"
                 size="small"
@@ -618,17 +622,16 @@ export default function Acomptes() {
                 pagination={false}
                 scroll={{ x: 640 }}
               />
-            </Card>
+            </div>
           )}
 
-          <Card
-            title={
-              <span>
+          {/* DOUANE */}
+          <div className="glass-card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#0a2c22' }}>
                 <ContainerOutlined style={{ color: '#EA580C', marginRight: 8 }} />
                 Acomptes douaniers - AIRS 2 %
-              </span>
-            }
-            extra={
+              </h3>
               <Space wrap size={12}>
                 <Text type="secondary">
                   Total encaisse : <Text strong>{formatAr(totalDouane)}</Text>
@@ -641,8 +644,8 @@ export default function Acomptes() {
                   Enregistrer une quittance
                 </Button>
               </Space>
-            }
-          >
+            </div>
+            
             {s.douane.length > 0 ? (
               <Table
                 rowKey="idAcompte"
@@ -658,28 +661,26 @@ export default function Acomptes() {
                 texte={`Aucune quittance enregistree pour l exercice ${annee}.`}
               />
             )}
-          </Card>
+          </div>
 
-          <Card
-            title={
-              <span>
-                <RiseOutlined style={{ color: '#0E7A55', marginRight: 8 }} />
-                Simulateur d&apos;atterrissage fiscal
-              </span>
-            }
-          >
+          {/* SIMULATEUR */}
+          <div className="glass-card">
+            <h3 style={{ margin: '0 0 16px 0', fontSize: 16, fontWeight: 600, color: '#0a2c22' }}>
+              <RiseOutlined style={{ color: '#0E7A55', marginRight: 8 }} />
+              Simulateur d&apos;atterrissage fiscal
+            </h3>
             <SimulateurLiquidation cumulAcomptes={s.cumulVerse || 0} />
-          </Card>
+          </div>
 
-          <Card
-            title={
-              <span>
+          {/* CHRONOLOGIE */}
+          <div className="glass-card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#0a2c22' }}>
                 <ClockCircleOutlined style={{ color: '#F59E0B', marginRight: 8 }} />
                 Chronologie des paiements
-              </span>
-            }
-            extra={<Text type="secondary">{chronologie.length} exercice(s)</Text>}
-          >
+              </h3>
+              <Text type="secondary">{chronologie.length} exercice(s)</Text>
+            </div>
             <ChronologiePaiements
               anneeCreation={anneeCreation}
               annee={annee}
@@ -687,7 +688,7 @@ export default function Acomptes() {
               acomptesVerses={s.cumulVerse || 0}
               chronologie={chronologie}
             />
-          </Card>
+          </div>
         </>
       )}
 

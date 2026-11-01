@@ -5,6 +5,7 @@ import mg.safidy.dto.SituationActiviteDTO;
 import mg.safidy.model.SuspensionActivite;
 import mg.safidy.service.SuspensionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize; // IMPORTANT
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -93,7 +94,9 @@ public class SuspensionController {
         return ResponseEntity.ok(service.genererAttestationRadiation(id));
     }
 
+    // SEUL LE RESPONSABLE PEUT ANNULER UN ARRÊT
     @PostMapping("/{id}/annuler")
+    @PreAuthorize("hasRole('RESPONSABLE')")
     public ResponseEntity<SuspensionActivite> annuler(@PathVariable Long id) {
         return ResponseEntity.ok(service.annuler(id));
     }

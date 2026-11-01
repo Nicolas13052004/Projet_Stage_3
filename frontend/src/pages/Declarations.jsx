@@ -136,8 +136,8 @@ export default function Declarations() {
     if (filtreStatut !== 'TOUS' && d.statut !== filtreStatut) return false;
     if (!termeRecherche) return true;
     const champs = [
-      d.contribuable?.nif ?? '-',
-      d.contribuable?.raisonSociale ?? '-',
+      d.nifContribuable ?? d.contribuable?.nif ?? '-',
+      d.nomContribuable ?? d.contribuable?.raisonSociale ?? '-',
       d.annee,
       formatAr(d.irDu),
       formatAr(d.soldeAPayer),
@@ -152,9 +152,9 @@ export default function Declarations() {
       key: 'contribuable',
       render: (_, d) => (
         <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.25 }}>
-          <Text strong>{d.contribuable?.raisonSociale || '-'}</Text>
+          <Text strong>{d.nomContribuable || d.contribuable?.raisonSociale || '-'}</Text>
           <Text type="secondary" style={{ fontSize: 12 }}>
-            NIF : {d.contribuable?.nif || '-'}
+            NIF : {d.nifContribuable || d.contribuable?.nif || '-'}
           </Text>
         </span>
       ),
@@ -193,15 +193,16 @@ export default function Declarations() {
 
   if (mode === 'editer' && idEnEdition) {
     return (
-      <div className="page">
+      <div className="page-container">
         <DeclarationForm idDeclaration={idEnEdition} onRetour={handleRetour} />
       </div>
     );
   }
 
   return (
-    <div className="page">
-      <div className="page-header">
+    <div className="page-container">
+      {/* EN-TÊTE */}
+      <div className="page-header-card glass-card">
         <div>
           <h1 className="page-title">Declarations IR</h1>
           <p className="page-subtitle">
@@ -218,8 +219,10 @@ export default function Declarations() {
         </Space>
       </div>
 
+      {/* FORMULAIRE DE CREATION RAPIDE */}
       {mode === 'nouveau' && (
-        <div style={{ marginBottom: 16 }}>
+        <div className="glass-card" style={{ marginBottom: 16 }}>
+          <h3 style={{ marginBottom: 16, fontSize: 16, fontWeight: 600, color: '#0a2c22' }}>Nouvelle déclaration</h3>
           <div className="toolbar">
             <ContribuableRecherche
               contribuables={contribuables}
@@ -245,13 +248,14 @@ export default function Declarations() {
             </Button>
             <Button onClick={() => setMode('liste')}>Annuler</Button>
           </div>
+          
           {erreurAnnee && (
-            <Text type="danger" style={{ display: 'block', marginBottom: 8 }}>
+            <Text type="danger" style={{ display: 'block', marginTop: 8 }}>
               {erreurAnnee}
             </Text>
           )}
-          {contribuableSelectionne && (
-            <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
+          {contribuableSelectionne && !erreurAnnee && (
+            <Text type="secondary" style={{ display: 'block', marginTop: 8 }}>
               Regime : REEL OBLIGATOIRE — le CA HT devra etre superieur ou egal a{' '}
               {formatAr(SEUIL_REEL_OBLIGATOIRE)} — Immatriculation :{' '}
               {contribuableSelectionne.dateImmatriculation || '-'}
@@ -260,7 +264,8 @@ export default function Declarations() {
         </div>
       )}
 
-      <div className="toolbar" style={{ marginBottom: 16 }}>
+      {/* BARRE D'OUTILS (RECHERCHE ET FILTRES) */}
+      <div className="toolbar-card glass-card">
         <SearchBar
           value={recherche}
           onChange={setRecherche}
@@ -288,7 +293,8 @@ export default function Declarations() {
         </Button>
       </div>
 
-      <div style={{ background: '#fff', padding: 16, borderRadius: 8 }}>
+      {/* TABLEAU */}
+      <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
         <Table
           rowKey="idDeclaration"
           columns={colonnes}
@@ -298,6 +304,7 @@ export default function Declarations() {
             pageSize: 15,
             showSizeChanger: false,
             showTotal: (t) => `${t} resultat(s)`,
+            style: { padding: '0 16px' }
           }}
           size="middle"
         />

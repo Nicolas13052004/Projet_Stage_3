@@ -2,14 +2,14 @@ import { useState } from 'react';
 
 /**
  * Logo de l'application.
- * Charge /logo.png (fourni par le centre fiscal) et bascule sur un
- * libelle de repli si l'image n'est pas encore installee.
+ * Charge l'image IR_logo.png depuis le dossier src et bascule sur un
+ * libellé de repli si l'image n'est pas trouvée.
  */
 export default function Logo({
   size = 32,
   repli = 'IR',
   style = {},
-  fondRepli = '#0E7A55',
+  fondRepli = '#0E7A55', // Vert du logo
   couleurRepli = '#fff',
 }) {
   const [ko, setKo] = useState(false);
@@ -39,15 +39,18 @@ export default function Logo({
 
   return (
     <img
-      src="/logo.png"
-      alt="Logo"
+      // On importe l'image depuis le dossier src
+      src={new URL('../IR_logo.png', import.meta.url).href}
+      alt="Logo Ministère - DGI"
       onError={() => setKo(true)}
       style={{
         width: size,
-        height: size,
+        height: 'auto', // Laisse la hauteur s'adapter pour ne pas écraser le logo ovale
+        maxHeight: size, // Limite la hauteur à la taille demandée
         objectFit: 'contain',
         borderRadius: Math.max(6, Math.round(size * 0.2)),
-        background: '#fff',
+        // On enlève le fond blanc forcé pour que le logo s'intègre mieux
+        background: 'transparent', 
         flexShrink: 0,
         ...style,
       }}

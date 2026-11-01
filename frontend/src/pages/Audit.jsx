@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Card, Row, Col, Statistic, Table, Tag, Select, Alert, Typography } from 'antd';
+import { Row, Col, Statistic, Table, Tag, Select, Alert, Typography } from 'antd';
 import {
   SnippetsOutlined,
   ClockCircleOutlined,
@@ -126,95 +126,106 @@ export default function Audit() {
   ];
 
   return (
-    <div className="page">
-      <div className="page-header">
+    <div className="page-container">
+      {/* EN-TÊTE */}
+      <div className="page-header-card glass-card">
         <div>
-          <h1 className="page-title">Journal d audit</h1>
+          <h1 className="page-title">Journal d'audit</h1>
           <p className="page-subtitle">Tracabilite de toutes les actions</p>
         </div>
       </div>
 
       {error && (
-        <Alert type="error" showIcon message={error} style={{ marginBottom: 16 }} />
+        <Alert type="error" showIcon message={error} className="glass-card" />
       )}
 
-      <SearchBar
-        value={recherche}
-        onChange={setRecherche}
-        placeholder="Recherche (action, table, agent)"
-      >
-        <Select
-          allowClear
-          placeholder="Toutes actions"
-          style={{ width: 180 }}
-          value={actionFiltre || undefined}
-          onChange={(v) => setActionFiltre(v || '')}
-          options={actions.map((a) => ({ value: a, label: a }))}
-        />
-      </SearchBar>
+      {/* BARRE DE RECHERCHE ET FILTRES */}
+      <div className="toolbar-card glass-card">
+        <SearchBar
+          value={recherche}
+          onChange={setRecherche}
+          placeholder="Recherche (action, table, agent)"
+        >
+          <Select
+            allowClear
+            placeholder="Toutes actions"
+            style={{ width: 180 }}
+            value={actionFiltre || undefined}
+            onChange={(v) => setActionFiltre(v || '')}
+            options={actions.map((a) => ({ value: a, label: a }))}
+          />
+        </SearchBar>
+      </div>
 
-      <Row gutter={[16, 16]} style={{ margin: '16px 0 24px' }}>
+      {/* STATISTIQUES */}
+      <Row gutter={[16, 16]}>
         <Col xs={12} md={6}>
-          <Card>
+          <div className="glass-card">
             <Statistic
               title="Total actions"
               value={stats.totalActions}
               prefix={<SnippetsOutlined style={{ color: '#0E7A55' }} />}
             />
-          </Card>
+          </div>
         </Col>
         <Col xs={12} md={6}>
-          <Card>
+          <div className="glass-card">
             <Statistic
               title="Actions aujourd'hui"
               value={stats.todayActions}
               prefix={<ClockCircleOutlined style={{ color: '#0369A1' }} />}
             />
-          </Card>
+          </div>
         </Col>
         <Col xs={12} md={6}>
-          <Card>
+          <div className="glass-card">
             <Statistic
               title="Agents actifs"
               value={stats.agents}
               prefix={<UserOutlined style={{ color: '#F59E0B' }} />}
             />
-          </Card>
+          </div>
         </Col>
         <Col xs={12} md={6}>
-          <Card>
+          <div className="glass-card">
             <Statistic
               title="Tables modifiees"
               value={stats.tables}
               prefix={<DatabaseOutlined style={{ color: '#7C3AED' }} />}
             />
-          </Card>
+          </div>
         </Col>
       </Row>
 
+      {/* TABLEAU */}
       {loading ? (
-        <SkeletonTable rows={10} cols={6} />
+        <div className="glass-card">
+          <SkeletonTable rows={10} cols={6} />
+        </div>
       ) : (
-        <Table
-          rowKey="idLog"
-          size="small"
-          columns={colonnes}
-          dataSource={listeFiltree}
-          scroll={{ x: 900 }}
-          pagination={{
-            pageSize: 15,
-            showSizeChanger: true,
-            showTotal: (total) => `${total} entree(s)`,
-          }}
-          locale={{
-            emptyText: (
-              <EmptyState
-                titre="Aucune action enregistree"
-                texte="Le journal d audit sera rempli automatiquement lors des operations"
-              />
-            ),
-          }}
-        />
+        <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+          <Table
+            rowKey="idLog"
+            size="small"
+            columns={colonnes}
+            dataSource={listeFiltree}
+            scroll={{ x: 900 }}
+            pagination={{
+              pageSize: 15,
+              showSizeChanger: true,
+              showTotal: (total) => `${total} entree(s)`,
+            }}
+            locale={{
+              emptyText: (
+                <EmptyState
+                  titre="Aucune action enregistree"
+                  texte="Le journal d audit sera rempli automatiquement lors des operations"
+                />
+              ),
+            }}
+            style={{ padding: '16px' }}
+          />
+        </div>
       )}
     </div>
   );

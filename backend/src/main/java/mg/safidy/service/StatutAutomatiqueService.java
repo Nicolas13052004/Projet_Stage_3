@@ -35,7 +35,18 @@ public class StatutAutomatiqueService {
         int acomptesMisAJour = 0;
 
         for (DeclarationIR d : declarationRepository.findAll()) {
+            // Repare les brouillons transformes a tort en EN_RETARD par l ancienne regle
+            // (un brouillon n a pas de date de depot).
+            if ("EN_RETARD".equals(d.getStatut()) && d.getDateDepot() == null) {
+                d.setStatut("BROUILLON");
+                declarationRepository.save(d);
+                declarationsMisAJour++;
+                continue;
+            }
             if (d.getDateLimite() == null) continue;
+            // Un brouillon (ou une declaration non validee) n est jamais mis en retard :
+            // seul le responsable peut la valider pour qu elle devienne exigible.
+            if ("BROUILLON".equals(d.getStatut()) || "CALCULEE".equals(d.getStatut())) continue;
             if ("PAYEE".equals(d.getStatut()) || "EN_RETARD".equals(d.getStatut())) continue;
             if (d.getDateLimite().isBefore(aujourdHui)) {
                 d.setStatut("EN_RETARD");

@@ -4,6 +4,7 @@ import mg.safidy.model.Paiement;
 import mg.safidy.service.PaiementService;
 import mg.safidy.config.AuditLogger;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize; // IMPORTANT
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -77,7 +78,9 @@ public class PaiementController {
         return ResponseEntity.ok(p);
     }
 
+    // SEUL LE RESPONSABLE PEUT ANNULER UN PAIEMENT
     @PostMapping("/{id}/annuler")
+    @PreAuthorize("hasRole('RESPONSABLE')")
     public ResponseEntity<Paiement> annuler(@PathVariable Long id,
                                              @RequestBody Map<String, String> body) {
         Paiement p = service.annuler(id, body.get("motif"));

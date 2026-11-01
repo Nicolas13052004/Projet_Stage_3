@@ -183,6 +183,14 @@ public class PaiementService {
             throw new BusinessException("La declaration n appartient pas a ce contribuable");
         }
 
+        // Le solde ne peut etre regle qu apres validation par le responsable.
+        if (REGLEMENT_TOUS.equals(typeReglement)
+                && !"VALIDEE".equals(d.getStatut())
+                && !"EN_RETARD".equals(d.getStatut())) {
+            throw new BusinessException(
+                    "La declaration doit etre validee par le responsable avant tout paiement");
+        }
+
         // Paiement unique : un seul reglement de ce type par declaration
         boolean dejaRegle = paiementRepository.findByDeclarationIdDeclaration(idDeclaration)
                 .stream()

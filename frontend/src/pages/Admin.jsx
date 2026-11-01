@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
   Alert,
-  Card,
   Row,
   Col,
   Statistic,
@@ -22,7 +21,7 @@ import {
   StopOutlined,
   SettingOutlined,
   UserAddOutlined,
-  KeyOutlined,
+  EditOutlined, // Nouvelle icône pour modifier
 } from '@ant-design/icons';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -49,10 +48,13 @@ export default function Admin() {
   const [edits, setEdits] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  
+  // États pour les modales
   const [ouvertCreation, setOuvertCreation] = useState(false);
-  const [resetCible, setResetCible] = useState(null);
+  const [agentEnEdition, setAgentEnEdition] = useState(null); // Remplace resetCible
+  
   const [formCreer] = Form.useForm();
-  const [formReset] = Form.useForm();
+  const [formEditer] = Form.useForm();
 
   const charger = async () => {
     try {
@@ -73,16 +75,14 @@ export default function Admin() {
 
   useEffect(() => {
     if (agent?.role === 'ADMIN') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       charger();
     }
-     
   }, [agent]);
 
   if (agent?.role !== 'ADMIN') {
     return (
-      <div className="page">
-        <Alert type="error" showIcon message="Acces reserve aux administrateurs." />
+      <div className="page-container">
+        <Alert type="error" showIcon message="Acces reserve aux administrateurs." className="glass-card" />
       </div>
     );
   }
@@ -120,15 +120,26 @@ export default function Admin() {
     }
   };
 
-  const handleReset = async (values) => {
-    if (!resetCible) return;
+  // Nouvelle fonction pour ouvrir la modale d'édition
+  const ouvrirEdition = (agentCible) => {
+    setAgentEnEdition(agentCible);
+    formEditer.setFieldsValue({
+      email: agentCible.email,
+      motDePasse: '', // Vide par défaut
+    });
+  };
+
+  // Nouvelle fonction pour soumettre l'édition
+  const handleEditer = async (values) => {
+    if (!agentEnEdition) return;
     try {
-      await adminService.reinitialiserMotDePasse(resetCible.idAgent, values.motDePasse);
-      toast.success('Mot de passe reinitialise');
-      formReset.resetFields();
-      setResetCible(null);
+      await adminService.modifierAgent(agentEnEdition.idAgent, values);
+      toast.success('Informations mises à jour');
+      setAgentEnEdition(null);
+      formEditer.resetFields();
+      charger();
     } catch (e) {
-      toast.error(e.response?.data?.message || 'Erreur');
+      toast.error(e.response?.data?.message || 'Erreur lors de la modification');
     }
   };
 
@@ -191,8 +202,9 @@ export default function Admin() {
           <Button type="link" size="small" icon={<StopOutlined />} onClick={() => handleStatut(a)}>
             {a.statut === 'ACTIF' ? 'Bloquer' : 'Activer'}
           </Button>
-          <Button type="link" size="small" icon={<KeyOutlined />} onClick={() => setResetCible(a)}>
-            Reinit. mdp
+          {/* BOUTON MODIFIÉ ICI */}
+          <Button type="link" size="small" icon={<EditOutlined />} onClick={() => ouvrirEdition(a)}>
+            Modifier
           </Button>
         </Space>
       ),
@@ -231,68 +243,51 @@ export default function Admin() {
   ];
 
   return (
-    <div className="page">
-      <div className="page-header">
+    <div className="page-container">
+      {/* EN-TÊTE */}
+      <div className="page-header-card glass-card">
         <div>
           <h1 className="page-title">Administration</h1>
           <p className="page-subtitle">Comptes agents et parametres fiscaux</p>
         </div>
       </div>
 
-      {error && <Alert type="error" showIcon message={error} style={{ marginBottom: 16 }} />}
+      {error && <Alert type="error" showIcon message={error} className="glass-card" />}
 
+      {/* STATISTIQUES */}
       <Row gutter={[16, 16]}>
         <Col xs={12} md={6}>
-          <Card>
-            <Statistic
-              title="Agents"
-              value={agents.length}
-              prefix={<TeamOutlined style={{ color: '#0E7A55' }} />}
-            />
-          </Card>
+          <div className="glass-card">
+            <Statistic title="Agents" value={agents.length} prefix={<TeamOutlined style={{ color: '#0E7A55' }} />} />
+          </div>
         </Col>
         <Col xs={12} md={6}>
-          <Card>
-            <Statistic
-              title="Agents actifs"
-              value={agentsActifs}
-              prefix={<CheckCircleOutlined style={{ color: '#16A34A' }} />}
-            />
-          </Card>
+          <div className="glass-card">
+            <Statistic title="Agents actifs" value={agentsActifs} prefix={<CheckCircleOutlined style={{ color: '#16A34A' }} />} />
+          </div>
         </Col>
         <Col xs={12} md={6}>
-          <Card>
-            <Statistic
-              title="Agents bloques"
-              value={agentsBloques}
-              prefix={<StopOutlined style={{ color: '#DC2626' }} />}
-            />
-          </Card>
+          <div className="glass-card">
+            <Statistic title="Agents bloques" value={agentsBloques} prefix={<StopOutlined style={{ color: '#DC2626' }} />} />
+          </div>
         </Col>
         <Col xs={12} md={6}>
-          <Card>
-            <Statistic
-              title="Parametres fiscaux"
-              value={parametres.length}
-              prefix={<SettingOutlined style={{ color: '#0369A1' }} />}
-            />
-          </Card>
+          <div className="glass-card">
+            <Statistic title="Parametres fiscaux" value={parametres.length} prefix={<SettingOutlined style={{ color: '#0369A1' }} />} />
+          </div>
         </Col>
       </Row>
 
-      <Card
-        title={`Agents (${agents.length})`}
-        style={{ margin: '16px 0' }}
-        extra={
-          <Button
-            type="primary"
-            icon={<UserAddOutlined />}
-            onClick={() => setOuvertCreation(true)}
-          >
+      {/* TABLEAU AGENTS */}
+      <div className="glass-card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#0a2c22' }}>
+            Agents ({agents.length})
+          </h3>
+          <Button type="primary" icon={<UserAddOutlined />} onClick={() => setOuvertCreation(true)}>
             Nouvel agent
           </Button>
-        }
-      >
+        </div>
         <Table
           rowKey="idAgent"
           size="small"
@@ -301,9 +296,13 @@ export default function Admin() {
           scroll={{ x: 1000 }}
           pagination={false}
         />
-      </Card>
+      </div>
 
-      <Card title={`Parametres fiscaux (${parametres.length})`}>
+      {/* TABLEAU PARAMETRES */}
+      <div className="glass-card">
+        <h3 style={{ margin: '0 0 16px 0', fontSize: 16, fontWeight: 600, color: '#0a2c22' }}>
+          Parametres fiscaux ({parametres.length})
+        </h3>
         <Table
           rowKey="idParam"
           size="small"
@@ -311,8 +310,9 @@ export default function Admin() {
           dataSource={parametres}
           pagination={false}
         />
-      </Card>
+      </div>
 
+      {/* MODAL CREATION */}
       <Modal
         open={ouvertCreation}
         title="Nouvel agent"
@@ -330,41 +330,22 @@ export default function Admin() {
         >
           <Row gutter={12}>
             <Col xs={24} md={12}>
-              <Form.Item
-                name="matricule"
-                label="Matricule"
-                rules={[{ required: true, message: 'Matricule requis' }]}
-              >
+              <Form.Item name="matricule" label="Matricule" rules={[{ required: true }]}>
                 <Input placeholder="Matricule" />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item
-                name="nom"
-                label="Nom"
-                rules={[{ required: true, message: 'Nom requis' }]}
-              >
+              <Form.Item name="nom" label="Nom" rules={[{ required: true }]}>
                 <Input placeholder="Nom" />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item
-                name="prenom"
-                label="Prenom"
-                rules={[{ required: true, message: 'Prenom requis' }]}
-              >
+              <Form.Item name="prenom" label="Prenom" rules={[{ required: true }]}>
                 <Input placeholder="Prenom" />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item
-                name="email"
-                label="Email"
-                rules={[
-                  { required: true, message: 'Email requis' },
-                  { type: 'email', message: 'Email invalide' },
-                ]}
-              >
+              <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
                 <Input placeholder="Email" />
               </Form.Item>
             </Col>
@@ -376,24 +357,12 @@ export default function Admin() {
             {centres.length > 1 && (
               <Col xs={24} md={12}>
                 <Form.Item name="idCentre" label="Centre">
-                  <Select
-                    options={centres.map((c) => ({
-                      value: c.idCentre,
-                      label: c.nom,
-                    }))}
-                  />
+                  <Select options={centres.map((c) => ({ value: c.idCentre, label: c.nom }))} />
                 </Form.Item>
               </Col>
             )}
             <Col span={24}>
-              <Form.Item
-                name="motDePasse"
-                label="Mot de passe"
-                rules={[
-                  { required: true, message: 'Mot de passe requis' },
-                  { min: 8, message: '8 caracteres minimum' },
-                ]}
-              >
+              <Form.Item name="motDePasse" label="Mot de passe" rules={[{ required: true, min: 8 }]}>
                 <Input.Password placeholder="Mot de passe" />
               </Form.Item>
             </Col>
@@ -404,32 +373,43 @@ export default function Admin() {
         </Form>
       </Modal>
 
+      {/* MODAL D'ÉDITION (Remplace l'ancienne modale de reset mdp) */}
       <Modal
-        open={!!resetCible}
+        open={!!agentEnEdition}
         title={
-          resetCible
-            ? `Reinitialiser le mot de passe - ${resetCible.prenom} ${resetCible.nom}`
+          agentEnEdition
+            ? `Modifier les informations - ${agentEnEdition.prenom} ${agentEnEdition.nom}`
             : ''
         }
-        onCancel={() => setResetCible(null)}
+        onCancel={() => setAgentEnEdition(null)}
         footer={null}
         destroyOnHidden
         centered
         width={440}
       >
-        <Form form={formReset} layout="vertical" onFinish={handleReset}>
+        <Form form={formEditer} layout="vertical" onFinish={handleEditer}>
+          <Form.Item
+            name="email"
+            label="Adresse e-mail"
+            rules={[
+              { required: true, message: 'L e-mail est obligatoire.' },
+              { type: 'email', message: 'Adresse invalide.' },
+            ]}
+          >
+            <Input placeholder="Nouvel e-mail" />
+          </Form.Item>
           <Form.Item
             name="motDePasse"
-            label="Nouveau mot de passe"
+            label="Nouveau mot de passe (optionnel)"
+            extra="Laissez vide pour conserver le mot de passe actuel."
             rules={[
-              { required: true, message: 'Mot de passe requis' },
               { min: 8, message: '8 caracteres minimum' },
             ]}
           >
             <Input.Password placeholder="Nouveau mot de passe" />
           </Form.Item>
-          <Button type="primary" htmlType="submit" block icon={<KeyOutlined />}>
-            Reinitialiser
+          <Button type="primary" htmlType="submit" block icon={<EditOutlined />}>
+            Enregistrer les modifications
           </Button>
         </Form>
       </Modal>
